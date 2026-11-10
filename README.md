@@ -110,7 +110,7 @@ Use HTTPS and `NODE_ENV=production` behind a reverse proxy for deployments with 
 npm test
 ```
 
-The built-in Node test runner executes **26 standalone tests**: 17 API validation and date tests, 2 browser-side date tests, 6 month-grid tests, and 1 time suggestion test. They cover input boundaries, dates, report ranges, calendar grouping, future-day exclusion, and the approximate clock-based slot suggestion.
+The built-in Node test runner executes **28 standalone tests**: 17 API validation/date tests, 2 browser-side date tests, 6 month-grid tests, and 3 daily-average tests. They cover input boundaries, dates, report ranges, calendar grouping, future-day exclusion, and daily history averages.
 
 An additional **PostgreSQL + HTTP integration suite with six named subtests** verifies registration, cookie authentication, rate-limit scope, cross-user access restrictions, CRUD, duplicate protection, the month diary query, averages, pagination, and logout. It is skipped by default to avoid modifying your development database. To run it, create a **separate disposable test database** `sweety_test`, then set `TEST_DATABASE_URL`:
 

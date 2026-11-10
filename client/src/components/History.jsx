@@ -1,5 +1,6 @@
 import { SLOTS } from '../lib/api.js';
 import { bandFor, bandLabel } from './DayEntries.jsx';
+import { dailyAverage } from '../lib/history.js';
 
 function formatDay(date) {
   const [year, month, day] = date.split('-').map(Number);
@@ -10,9 +11,7 @@ function formatDay(date) {
 
 function DayRow({ date, readings, onSelectCell }) {
   const slotMap = new Map(readings.map((reading) => [reading.slot, reading]));
-  const average = readings.length
-    ? (readings.reduce((total, reading) => total + Number(reading.value), 0) / readings.length).toFixed(1)
-    : null;
+  const average = dailyAverage(readings);
 
   return (
     <li className="history-day">

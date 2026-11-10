@@ -467,3 +467,88 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; font-optical-si
   .mobile-auth-brand { margin-bottom: 26px; }
   .demo-entry { flex-wrap: wrap; }
 }
+
+/* History is grouped by complete days, with the same slot order as the diary. */
+.history-legend { margin: 0 0 15px; }
+.history-days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.history-day {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(125px, 165px) minmax(0, 1fr) minmax(76px, 95px);
+  gap: clamp(9px, 2vw, 20px);
+  align-items: center;
+  padding: 16px clamp(12px, 2vw, 22px);
+  border-bottom: 1px solid var(--line);
+}
+.history-day:last-child { border-bottom: 0; }
+.history-date { min-width: 0; }
+.history-date-label { color: var(--text); font-size: 12px; font-weight: 700; }
+.history-mobile-avg { display: none; }
+.history-chips {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.history-chip {
+  --chip-color: var(--primary);
+  display: flex;
+  min-width: 0;
+  min-height: 66px;
+  padding: 8px 5px;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--lav-50);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+.history-chip-name { color: var(--body); font-weight: 600; font-size: 10px; line-height: 1.2; }
+.history-chip-number { color: var(--chip-color); font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 800; line-height: 1.1; }
+.history-chip.band-low { --chip-color: var(--low); background: #F0F5FC; border-color: #D7E3F5; }
+.history-chip.band-in-range { --chip-color: var(--in-range); background: #EDF7F3; border-color: #D6EAE2; }
+.history-chip.band-high { --chip-color: var(--high); background: #FEF4E9; border-color: #F1E0C8; }
+.history-chip.band-very-high { --chip-color: var(--very-high); background: var(--rose-50); border-color: #F5CAD5; }
+.history-chip-empty { background: transparent; border-style: dashed; border-color: var(--lav-200); }
+.history-chip-empty .history-chip-number { color: var(--faint); font-size: 18px; }
+.history-chip:hover:not(:disabled) { border-color: var(--lav-400); box-shadow: 0 0 0 2px var(--lav-100); }
+.history-chip:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.history-desktop-avg { color: var(--muted); text-align: right; white-space: nowrap; }
+.history-desktop-avg span { display: block; font-size: 10px; }
+.history-desktop-avg strong { display: inline-block; color: var(--text); font-variant-numeric: tabular-nums; font-size: 18px; font-weight: 800; }
+.history-desktop-avg small { font-size: 10px; display: block; }
+.history-more { margin-top: 19px; display: flex; justify-content: center; }
+.history-more .button { min-width: 170px; }
+.history-error { margin-top: 13px; }
+@media (max-width: 800px) {
+  .history-day { grid-template-columns: minmax(118px, 148px) minmax(0, 1fr) 77px; gap: 8px; }
+  .history-chips { gap: 5px; }
+  .history-chip { padding: 8px 2px; }
+}
+@media (max-width: 700px) {
+  .history-day { grid-template-columns: minmax(0, 1fr); gap: 9px; padding: 13px 11px; }
+  .history-date { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .history-date-label { font-size: 11px; }
+  .history-mobile-avg { display: inline; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .history-desktop-avg { display: none; }
+  .history-chips { gap: 5px; }
+  .history-chip { min-height: 62px; padding: 6px 3px; }
+  .history-chip-number { font-size: 15px; }
+}
+@media (max-width: 365px) {
+  .history-date-label, .history-mobile-avg { font-size: 10px; }
+  .history-chips { gap: 4px; }
+  .history-chip-name { font-size: 9px; }
+  .history-chip-number { font-size: 14px; }
+}
