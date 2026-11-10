@@ -432,7 +432,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; font-optical-si
   .month-table th:first-child { width: 16%; padding-left: 5px; }
   .month-table th:last-child { width: 13%; }
   .month-table .day-link { font-size: 10px; white-space: nowrap; }
-  .month-table td .cell-button { font-size: 11px; min-height: 32px; padding: 3px 0; width: 100%; }
+  .month-table td .cell-button { font-size: 11px; min-height: 38px; padding: 3px 0; width: 100%; }
   .month-table .day-average { font-size: 10px; }
 }
 @media (max-width: 390px) {
@@ -532,7 +532,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; font-optical-si
 }
 @media (max-width: 700px) {
   .history-day { grid-template-columns: minmax(0, 1fr); gap: 9px; padding: 13px 11px; }
-  .history-date { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .history-date { display: flex; align-items: flex-start; flex-direction: column; gap: 3px; }
   .history-date-label { font-size: 11px; }
   .history-mobile-avg { display: inline; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .history-desktop-avg { display: none; }

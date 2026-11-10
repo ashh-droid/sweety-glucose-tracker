@@ -15,7 +15,7 @@ A private, full-stack glucose reading journal built for the **Kenpath Junior Ful
 - Database `UNIQUE(user_id, reading_date, slot)` and `CHECK` constraints protect data even if multiple requests arrive concurrently.
 - Daily, **month-to-date**, and **previous full calendar month** reports: minimum, maximum, average (1 decimal), and count. The daily report lists each entry.
 - Responsive logbook layout with four in-place entry boxes, print-friendly month diary, empty states, and loading/error feedback.
-- **Bonus:** server-side pagination for `GET /api/readings?page=1&limit=20`, used in the reading-history panel. A user-scoped `GET /api/readings/month?month=YYYY-MM` serves the printable diary.
+- **Bonus:** reading-level pagination at `GET /api/readings?page=1&limit=20` and complete-day cursor pagination at `GET /api/readings/days?limit=7&before=YYYY-MM-DD`. A user-scoped `GET /api/readings/month?month=YYYY-MM` serves the printable diary.
 - A reusable seed script that creates or refreshes a demo account and sample readings.
 
 ## Prerequisites
@@ -139,7 +139,8 @@ The integration test creates schema objects, inserts unique temporary accounts, 
 | `GET` | `/api/auth/me` | Return current user's basic profile |
 | `POST` | `/api/auth/logout` | Clear session |
 | `GET` | `/api/readings?date=2026-10-15` | Read own entries for a date (optional date) |
-| `GET` | `/api/readings?page=1&limit=20` | Paginated history (bonus) |
+| `GET` | `/api/readings?page=1&limit=20` | Paginated individual readings (bonus) |
+| `GET` | `/api/readings/days?limit=7&before=YYYY-MM-DD` | Complete days of reading history, cursor pagination |
 | `POST` | `/api/readings` | Create `{date,slot,value}` |
 | `PATCH` / `PUT` | `/api/readings/:id` | Edit fields of an owned reading (excludes itself from duplicate check) |
 | `DELETE` | `/api/readings/:id` | Delete an owned reading |
@@ -199,7 +200,7 @@ server/
 - **Validation precedence:** required value → integer range (40–600) → future date (or invalid date) → valid slot → count of already-filled slots → duplicate slot. For an already-full day, **the four-readings error wins over the duplicate error**. API validation failures return HTTP `400` with `{ "error": "..." }`; duplicate account emails return `409`. PostgreSQL unique violations are caught as a fallback for simultaneous requests.
 - Date values are returned as `YYYY-MM-DD` strings via the PostgreSQL type parser (`DATE`, OID 1082) to avoid time-zone conversion. Both API and frontend interpret **today** in `Asia/Kolkata`; configure this consistently if adapting the application to another timezone.
 - Tests use `node:test` rather than Jest: this keeps dev dependencies minimal while Supertest still exercises real HTTP requests when a disposable PostgreSQL test database is available. The client uses the browser's native `fetch` rather than adding Axios; neither choice affects assignment requirements.
-- Daily report shows all readings ordered by slot. The history panel is paginated by newest date.
+- Daily report shows all readings ordered by slot. History fetches the seven newest dates that contain readings and loads older complete days on demand.
 - Dates are stored as PostgreSQL `DATE` values, not timestamps, because readings have a prescribed daily time slot and no exact clock time is required.
 - For ease of review, a simple cookie-backed login is used rather than third-party identity providers. The app deliberately avoids medical interpretation and external analytics.
 - **What I'd improve with more time:** React Testing Library form tests, charts, password reset/verified email, CSRF token for wider deployment scenarios, account deletion/export, production secret management, automated accessibility audits, monitoring, and a robust CI pipeline. Bonus Redis/BullMQ/doctor accounts were intentionally not added because core correctness came first.
