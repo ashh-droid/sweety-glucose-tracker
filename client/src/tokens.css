@@ -26,11 +26,16 @@
   --rose-50: #FDEEF1;
   --rose-700: #B04460;
 
-  /* Glucose reference bands — illustrative, not medical guidance */
+  /* Glucose reference bands: illustrative, not medical guidance */
   --low: #3D6FB6;
   --in-range: #3F8F72;
   --high: #CC8433;
   --very-high: #B04460;
+
+  /* Font families */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Figtree', system-ui, sans-serif;
+  --font-brand: 'Plus Jakarta Sans', sans-serif;
 
   /* Semantic roles */
   --text: var(--lav-900);

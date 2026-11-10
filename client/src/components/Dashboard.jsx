@@ -92,14 +92,14 @@ export default function Dashboard({ user, onLogout }) {
     <div className="logbook-shell">
       <header className="masthead no-print">
         <div className="masthead-inner">
-          <div className="identity"><Brand /><span className="identity-divider"/><span className="identity-meta">Logbook <span>·</span> {user.name}</span></div>
+          <div className="identity"><Brand /><span className="identity-divider"/><span className="identity-meta">Logbook <span>|</span> {user.name}</span></div>
           <div className="masthead-actions"><DateNav date={selectedDate} onChange={changeDate} />
             <button type="button" className="sign-out" onClick={onLogout}><LogOut size={16}/> <span>Sign out</span></button>
           </div>
         </div>
       </header>
       <main className="logbook-main">
-        <div className="print-title print-only"><h1>Sweety · Glucose logbook</h1><p>{user.name} · {month}</p></div>
+        <div className="print-title print-only"><h1>Sweety | Glucose logbook</h1><p>{user.name} · {month}</p></div>
         <div className="page-intro no-print"><div><p className="section-kicker">PERSONAL GLUCOSE JOURNAL</p><h1>Your readings, clearly.</h1></div><span className="intro-side">A record you can revisit, day by day.</span></div>
         {error && <div role="alert" className="alert error no-print">{error} <button type="button" className="inline-link" onClick={refresh}>Retry</button></div>}
         {notice && <div role="status" className="alert success no-print">{notice}</div>}
@@ -110,7 +110,7 @@ export default function Dashboard({ user, onLogout }) {
         <MonthGrid month={month} onChange={setMonth} readings={monthReadings} loading={monthLoading}
           error={monthError} onSelectDate={(date) => { changeDate(date); window.scrollTo({ top: 0, behavior: 'smooth' }); }}/>
         <div className="no-print"><History recent={recent} page={recentPage} onPageChange={setRecentPage}/></div>
-        <footer className="logbook-footer no-print"><span>Sweety · Your personal reading log</span><span>Tracking only. Not for diagnosis or treatment.</span></footer>
+        <footer className="logbook-footer no-print"><span>Sweety | Your personal reading log</span><span>Tracking only. Not for diagnosis or treatment.</span></footer>
       </main>
     </div>
   );

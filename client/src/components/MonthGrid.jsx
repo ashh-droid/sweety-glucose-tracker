@@ -49,7 +49,7 @@ export default function MonthGrid({ month, onChange, readings, loading, error, o
                       const reading = byCell.get(`${date}|${slot.value}`);
                       return <td key={slot.value}>{reading
                         ? <span className={`table-reading band-${bandFor(reading.value)}`} aria-label={`${reading.value} mg/dl`}>{reading.value}</span>
-                        : <span className="table-blank" aria-label="No reading">—</span>}</td>;
+                        : <span className="table-blank" aria-label="No reading">·</span>}</td>;
                     })}
                   </tr>
                 );
