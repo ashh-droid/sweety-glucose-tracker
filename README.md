@@ -1,4 +1,4 @@
-# Sweety — Blood Glucose Tracker
+# Sweety | Blood Glucose Tracker
 
 A private, full-stack glucose reading journal built for the **Kenpath Junior Full Stack Developer – JavaScript & AI** engineering assignment.
 
@@ -191,7 +191,7 @@ server/
 
 **Privacy and correctness:** passwords are bcrypt hashes; JWT is stored in a non-readable HTTP-only cookie; SQL uses parameter placeholders; `/readings` and `/reports` always filter on authenticated user ID. Report aggregation is done in PostgreSQL. `DATE` values are returned as date-only strings, avoiding UTC day rollover. The date-validation timezone defaults to `Asia/Kolkata` (`APP_TIMEZONE` on the server; keep the frontend `localDate` helper consistent if you change it).
 
-## Notes — assumptions & tradeoffs
+## Notes | Assumptions and tradeoffs
 
 - The phrase “MERN + PostgreSQL” in the assignment is interpreted as **React + Express + Node.js + PostgreSQL**, not MongoDB, because PostgreSQL is explicitly required.
 - “Monthly” means the **whole previous calendar month** relative to the selected date (e.g. Oct 15 → Sep 1–30), not a rolling 30 days. “Month to date” begins on the first of the selected month.
@@ -214,3 +214,15 @@ server/
 - Colored value bands are illustrative UI categories, **not** personalized targets, diagnosis, or medical advice. Clinical interpretation depends on the individual and the measurement timing.
 - One month of readings is fetched in a dedicated authenticated query (at most 124 readings), avoiding truncation by history pagination.
 - Production improvements would include TLS termination, CSRF defenses for cookie-authenticated mutation routes when deployed cross-origin, login monitoring, expanded React interaction tests, configurable timezone across client and server, and medically reviewed user-specific ranges rather than illustrative bands.
+
+
+## Interface and usability
+
+- Uses the supplied Sweety sugar-cube logo, favicon, lavender color tokens and Fraunces + Figtree type pairing.
+- The four reading slots are the primary task immediately below the masthead. Empty slots open an autofocused numerical input; press Enter to save and Escape to cancel.
+- The optional “Now” marker is based only on the Asia/Kolkata clock, not a personalized meal reminder.
+- Delete is accessible only when editing, with explicit confirmation.
+- The monthly log shows dates only through today in the current month, collapses long empty periods, and lets any cell open the corresponding reading form.
+- The print stylesheet expands collapsed periods so a paper copy includes each calendar day shown for the selected month.
+- The 70–180 band is an illustrative category, not medical guidance. Aggregate values mix different meal slots and are not a diagnostic assessment.
+- The month-to-date comparison uses the same numbered days of the previous month, clipped to its final day, rather than comparing with the full previous month.

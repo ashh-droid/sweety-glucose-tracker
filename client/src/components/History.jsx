@@ -5,7 +5,7 @@ export default function History({ recent, page, onPageChange }) {
   const { readings, pagination } = recent;
   return (
     <section className="section history-section" aria-labelledby="history-title">
-      <div className="section-head"><div><p className="section-kicker">RECENT ENTRIES</p><h2 id="history-title">Reading history</h2></div><span className="section-caption">{pagination.total} total</span></div>
+      <div className="section-head"><div><h2 id="history-title">Reading history</h2></div><span className="section-caption">{pagination.total} total</span></div>
       {readings.length === 0 ? <p className="history-empty">No entries yet. Your reading history will appear here.</p> : (
         <>
           <ul className="history-list">

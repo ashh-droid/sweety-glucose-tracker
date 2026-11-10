@@ -64,7 +64,7 @@ h1, h2, h3 { color: var(--text); }
 .logbook-main { max-width: 1180px; margin: 0 auto; padding: 45px 30px 55px; }
 .page-intro { display: flex; align-items: end; justify-content: space-between; gap: 25px; padding: 0 0 34px; }
 .page-intro h1 { font-family: var(--font-display); font-size: clamp(38px, 5.4vw, 57px); font-weight: 400; letter-spacing: -.035em; line-height: 1.03; margin-bottom: 0; }
-.section-kicker { font-family: 'Public Sans', sans-serif; color: var(--lav-600); font-size: 10px; letter-spacing: .14em; font-weight: 700; margin-bottom: 8px; }
+.section-kicker { font-family: var(--font-body); color: var(--lav-600); font-size: 10px; letter-spacing: .14em; font-weight: 700; margin-bottom: 8px; }
 .intro-side { color: var(--muted); max-width: 210px; text-align: right; line-height: 1.6; padding-bottom: 3px; }
 .section { border-top: 1px solid var(--line); padding: 30px 0 34px; }
 .section-head { display: flex; gap: 20px; align-items: end; justify-content: space-between; margin-bottom: 21px; }
