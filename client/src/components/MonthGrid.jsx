@@ -9,6 +9,12 @@ function shiftMonth(iso, offset) {
   return new Date(Date.UTC(year, month - 1 + offset, 1)).toISOString().slice(0, 7);
 }
 
+function shortSlotName(slot) {
+  if (slot.short === 'Fasting') return 'Fast';
+  if (slot.short === 'Breakfast') return 'Bkfst';
+  return slot.short;
+}
+
 function labelMonth(iso) {
   const [year, month] = iso.split('-').map(Number);
   return new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1));
@@ -27,7 +33,14 @@ export default function MonthGrid({ month, onChange, readings = [], loading, err
     return (
       <tr key={date} className={`${date === today ? 'current-day-row' : ''} ${extraClass}`}>
         <th scope="row">
-          <button className="day-link no-print" type="button" onClick={() => onSelectDate(date)} aria-label={`View ${date}`}>{weekdayDate(date)}</button>
+          <button
+            className="day-link no-print"
+            type="button"
+            onClick={() => onSelectDate(date)}
+            aria-label={`View ${date}`}
+          >
+            {weekdayDate(date)}
+          </button>
           <span className="print-only">{weekdayDate(date)}</span>
         </th>
         {SLOTS.map((slot) => {
@@ -54,9 +67,30 @@ export default function MonthGrid({ month, onChange, readings = [], loading, err
       <div className="section-head month-heading">
         <h2 id="month-title">{labelMonth(month)}</h2>
         <div className="month-tools no-print">
-          <button type="button" className="icon-button" onClick={() => onChange(shiftMonth(month, -1))} aria-label="Previous month"><ChevronLeft size={18}/></button>
-          <button type="button" className="icon-button" disabled={month >= today.slice(0, 7)} onClick={() => onChange(shiftMonth(month, 1))} aria-label="Next month"><ChevronRight size={18}/></button>
-          <button type="button" className="button outline print-button" onClick={() => window.print()}><Printer size={16}/> Print</button>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={() => onChange(shiftMonth(month, -1))}
+            aria-label="Previous month"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            className="icon-button"
+            disabled={month >= today.slice(0, 7)}
+            onClick={() => onChange(shiftMonth(month, 1))}
+            aria-label="Next month"
+          >
+            <ChevronRight size={18} />
+          </button>
+          <button
+            type="button"
+            className="button outline print-button"
+            onClick={() => window.print()}
+          >
+            <Printer size={16} /> Print
+          </button>
         </div>
       </div>
       <div className="band-key band-key-top" aria-label="Illustrative value bands">
@@ -70,7 +104,17 @@ export default function MonthGrid({ month, onChange, readings = [], loading, err
       {loading ? <div className="month-loading" role="status">Loading month...</div> : (
         <div className="table-scroll" role="region" aria-label="Monthly glucose log" tabIndex="0">
           <table className="month-table">
-            <thead><tr><th scope="col">Day</th>{SLOTS.map((s) => <th scope="col" key={s.value}>{s.short === 'Fasting' ? 'Fast' : s.short === 'Breakfast' ? 'Bkfst' : s.short}</th>)}<th scope="col">Avg.</th></tr></thead>
+            <thead>
+              <tr>
+                <th scope="col">Day</th>
+                {SLOTS.map((slot) => (
+                  <th scope="col" key={slot.value}>
+                    {shortSlotName(slot)}
+                  </th>
+                ))}
+                <th scope="col">Avg.</th>
+              </tr>
+            </thead>
             <tbody>
               {groups.map((group) => {
                 if (group.type === 'day') return renderDay(group.dates[0]);
@@ -79,7 +123,13 @@ export default function MonthGrid({ month, onChange, readings = [], loading, err
                 return (
                   <Fragment key={key}>
                     <tr className="empty-group-row no-print"><td colSpan={6}>
-                      <button type="button" className="expand-stretch" onClick={() => setExpanded((old) => opened ? old.filter((id) => id !== key) : [...old, key])}>
+                      <button
+                        type="button"
+                        className="expand-stretch"
+                        onClick={() => setExpanded((old) =>
+                          opened ? old.filter((id) => id !== key) : [...old, key]
+                        )}
+                      >
                         {weekdayDate(group.dates[0])} to {weekdayDate(group.dates[group.dates.length - 1])}: no readings
                         <span>{opened ? 'Collapse' : 'Show dates'}</span>
                       </button>
@@ -92,7 +142,11 @@ export default function MonthGrid({ month, onChange, readings = [], loading, err
           </table>
         </div>
       )}
-      <p className="disclaimer">These bands are illustrative reference categories, not individual treatment goals. Values differ by meal timing and person; Sweety is a record-keeping tool, not medical guidance.</p>
+      <p className="disclaimer">
+        These bands are illustrative reference categories, not individual
+        treatment goals. Values differ by meal timing and person; Sweety is a
+        record-keeping tool, not medical guidance.
+      </p>
     </section>
   );
 }
