@@ -112,19 +112,19 @@ npm test
 
 The built-in Node test runner executes **19 isolated tests** (17 API-side validation/date tests and 2 client-side date formatting tests): missing and decimal values, range boundaries, nonexistent dates, future dates, all four time slots, leap-year and year-boundary report ranges, timezone behavior, and account-validation rules.
 
-An additional **PostgreSQL + HTTP integration test** verifies registration, cookie authentication, rate-limit scope, cross-user access restrictions, CRUD, duplicate protection, the month diary query, averages, pagination, and logout. It is skipped by default to avoid modifying your development database. To run it, create a **separate disposable test database** `sweety_test`, then set `TEST_DATABASE_URL`:
+An additional **PostgreSQL + HTTP integration suite with six named subtests** verifies registration, cookie authentication, rate-limit scope, cross-user access restrictions, CRUD, duplicate protection, the month diary query, averages, pagination, and logout. It is skipped by default to avoid modifying your development database. To run it, create a **separate disposable test database** `sweety_test`, then set `TEST_DATABASE_URL`:
 
 macOS/Linux:
 
 ```bash
-TEST_DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/sweety_test npm test
+TEST_DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/sweety_test npm run test:integration
 ```
 
 Windows PowerShell:
 
 ```powershell
 $env:TEST_DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/sweety_test"
-npm test
+npm run test:integration
 Remove-Item Env:TEST_DATABASE_URL
 ```
 
