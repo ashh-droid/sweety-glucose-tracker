@@ -20,6 +20,7 @@
   /* Sugar accents */
   --sparkle: #F6B48C;
   --peach-50: #FFF3EA;
+  --peach-200: #F9CDAE;
   --peach-600: #C2622F;
   --peach-ink: #7A3A17;
   --dot: #E8899B;
@@ -33,7 +34,7 @@
   --very-high: #B04460;
 
   /* Font families */
-  --font-display: 'Fraunces', Georgia, serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
   --font-body: 'Figtree', system-ui, sans-serif;
   --font-brand: 'Plus Jakarta Sans', sans-serif;
 

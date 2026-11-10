@@ -218,7 +218,7 @@ server/
 
 ## Interface and usability
 
-- Uses the supplied Sweety sugar-cube logo, favicon, lavender color tokens and Fraunces + Figtree type pairing.
+- Uses the supplied Sweety sugar-cube logo, favicon, lavender color tokens and Plus Jakarta Sans + Figtree type pairing.
 - Four reading slots appear directly below the masthead. Empty slots open an autofocused numerical input; press Enter to save or Escape to cancel.
 - Delete is accessible only when editing, with explicit confirmation.
 - The monthly log shows dates only through today in the current month, collapses long empty periods, and lets any cell open the corresponding reading form.
@@ -229,3 +229,7 @@ server/
 ## Grouped history
 
 The Reading history section uses `GET /api/readings/days?limit=7&before=YYYY-MM-DD` to load seven complete calendar days containing readings. The `before` date is exclusive; the optional `nextBefore` cursor fetches older days, without splitting one day's readings across pages. Each day's four chips can open the related entry box; empty slots remain visible. The original reading-level paginated endpoint remains available for API clients.
+
+## Optional local sign-in demo autofill
+
+To display the **Use demo** button on the sign-in screen, create an untracked `client/.env.local` file with `VITE_SHOW_DEMO=true`, then restart Vite. The button fills `demo@sweety.local` and `Demo12345!` but does not submit the form automatically. The demo account must have been created with `npm run db:seed`. Do not enable this option on a public deployment or seed production data. The left-panel preview shows fictional example values only.
