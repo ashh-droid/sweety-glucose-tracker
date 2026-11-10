@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import Brand from './Brand.jsx';
 import { api } from '../lib/api.js';
 
-const demoVisible = import.meta.env.VITE_SHOW_DEMO === 'true';
+const demoVisible = import.meta.env.DEV && import.meta.env.VITE_SHOW_DEMO !== 'false';
 const demoEmail = 'demo@sweety.local';
 const demoPassword = 'Demo12345!';
 

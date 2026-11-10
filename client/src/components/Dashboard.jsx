@@ -8,6 +8,16 @@ import MonthGrid from './MonthGrid.jsx';
 import History from './History.jsx';
 import { api, localDate } from '../lib/api.js';
 
+function shortDate(date) {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Intl.DateTimeFormat('en-IN', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC'
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
 export default function Dashboard({ user, onLogout }) {
   const [selectedDate, setSelectedDate] = useState(localDate());
   const [focusRequest, setFocusRequest] = useState(null);
@@ -128,7 +138,13 @@ export default function Dashboard({ user, onLogout }) {
     <div className="logbook-shell">
       <header className="masthead no-print">
         <div className="masthead-inner">
-          <div className="identity"><Brand /><span className="identity-divider"/><span className="identity-meta">Logbook <span>|</span> {user.name}</span></div>
+          <div className="identity">
+            <Brand />
+            <span className="identity-divider" />
+            <span className="identity-meta">
+              Logbook <span>|</span> {user.name}
+            </span>
+          </div>
           <div className="masthead-actions"><DateNav date={selectedDate} onChange={changeDate} />
             <button type="button" className="sign-out" onClick={onLogout}><LogOut size={16}/> <span>Sign out</span></button>
           </div>
@@ -137,21 +153,64 @@ export default function Dashboard({ user, onLogout }) {
       <main className="logbook-main">
         <div className="print-title print-only"><h1>Sweety | Glucose logbook</h1><p>{user.name} · {month}</p></div>
         {selectedDate !== localDate() && <div className="past-date-notice no-print" role="status">
-          <span>Viewing {new Intl.DateTimeFormat('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(selectedDate + 'T12:00:00'))}</span>
+          <span>Viewing {shortDate(selectedDate)}</span>
           <button type="button" onClick={() => changeDate(localDate())}>Back to today</button>
         </div>}
-        {error && <div role="alert" className="alert error no-print">{error} <button type="button" className="inline-link" onClick={refresh}>Retry</button></div>}
+        {error && (
+          <div role="alert" className="alert error no-print">
+            {error}{' '}
+            <button type="button" className="inline-link" onClick={refresh}>
+              Retry
+            </button>
+          </div>
+        )}
         {notice && <div role="status" className="alert success no-print">{notice}</div>}
-        {loading && (!report || report.selectedDate !== selectedDate) ? <p role="status" className="loading-text">Loading your logbook...</p> : report && report.selectedDate === selectedDate && <>
-          <div className="no-print"><DayEntries date={selectedDate} readings={report.daily.readings} busy={saving} onSave={saveReading} onDelete={deleteReading} focusRequest={focusRequest}/></div>
-          <div className="no-print"><ReportLedger report={report}/></div>
-        </>}
-        <MonthGrid month={month} onChange={setMonth} readings={monthReadings} loading={monthLoading}
-          error={monthError} onSelectDate={(date) => { changeDate(date); window.scrollTo({ top: 0, behavior: 'smooth' }); }} onSelectCell={selectCell}/>
-        <div className="no-print"><History days={historyDays} hasMore={historyHasMore}
-          loading={historyLoading} loadingOlder={olderLoading} error={historyError}
-          onLoadOlder={loadOlderDays} onSelectCell={selectCell}/></div>
-        <footer className="logbook-footer no-print"><span>Sweety | Your personal reading log</span><span>Tracking only. Not for diagnosis or treatment.</span></footer>
+        {loading && (!report || report.selectedDate !== selectedDate) ? (
+          <p role="status" className="loading-text">Loading your logbook...</p>
+        ) : report && report.selectedDate === selectedDate && (
+          <>
+            <div className="no-print">
+              <DayEntries
+                date={selectedDate}
+                readings={report.daily.readings}
+                busy={saving}
+                onSave={saveReading}
+                onDelete={deleteReading}
+                focusRequest={focusRequest}
+              />
+            </div>
+            <div className="no-print">
+              <ReportLedger report={report} />
+            </div>
+          </>
+        )}
+        <MonthGrid
+          month={month}
+          onChange={setMonth}
+          readings={monthReadings}
+          loading={monthLoading}
+          error={monthError}
+          onSelectDate={(date) => {
+            changeDate(date);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onSelectCell={selectCell}
+        />
+        <div className="no-print">
+          <History
+            days={historyDays}
+            hasMore={historyHasMore}
+            loading={historyLoading}
+            loadingOlder={olderLoading}
+            error={historyError}
+            onLoadOlder={loadOlderDays}
+            onSelectCell={selectCell}
+          />
+        </div>
+        <footer className="logbook-footer no-print">
+          <span>Sweety | Your personal reading log</span>
+          <span>Tracking only. Not for diagnosis or treatment.</span>
+        </footer>
       </main>
     </div>
   );

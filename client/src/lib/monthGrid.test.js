@@ -13,7 +13,7 @@ test('past month shows the complete month including leap February', () => {
 test('future months produce no editable days', () => {
   assert.deepEqual(visibleDates('2026-12', '2026-11-11'), []);
 });
-test('groups empty stretches but preserves today's individual row', () => {
+test("groups empty stretches but preserves today's individual row", () => {
   const dates = visibleDates('2026-11', '2026-11-11');
   const groups = monthRows(dates, [{date:'2026-11-05',slot:'after_lunch'}], '2026-11-11');
   assert.equal(groups[0].type, 'empty');
