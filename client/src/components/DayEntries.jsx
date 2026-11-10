@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { SLOTS, localDate } from '../lib/api.js';
-import Sparkle from './Sparkle.jsx';
-import { suggestedSlot } from '../lib/suggestion.js';
+import { SLOTS } from '../lib/api.js';
 
 export function bandFor(value) {
   const n = Number(value);
@@ -19,7 +17,7 @@ export const bandLabel = {
   'very-high': 'Well above reference band'
 };
 
-function SlotEntry({ slot, reading, date, busy, onSave, onDelete, suggested, focusRequest }) {
+function SlotEntry({ slot, reading, date, busy, onSave, onDelete, focusRequest }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
@@ -68,7 +66,7 @@ function SlotEntry({ slot, reading, date, busy, onSave, onDelete, suggested, foc
   }
 
   return (
-    <article className={`slot-entry ${reading ? `is-filled band-${bandFor(reading.value)}` : 'is-empty'} ${suggested && !reading ? 'slot-now' : ''}`}>
+    <article className={`slot-entry ${reading ? `is-filled band-${bandFor(reading.value)}` : 'is-empty'}`}>
       {editing ? (
         <>
           <div className="slot-label">{slot.label}</div>
@@ -97,7 +95,7 @@ function SlotEntry({ slot, reading, date, busy, onSave, onDelete, suggested, foc
       ) : (
         <button type="button" className="slot-add slot-add-full" onClick={openEditor} disabled={busy}
           aria-label={`Add a reading for ${slot.label}`}>
-          <span className="slot-add-top"><span className="slot-label">{slot.label}</span>{suggested && <span className="now-tag"><Sparkle size={13}/> Now</span>}</span>
+          <span className="slot-add-top"><span className="slot-label">{slot.label}</span></span>
           <span className="slot-add-center"><Plus size={24} aria-hidden="true"/><span>Enter reading</span></span>
           <span className="slot-add-foot">Tap or click anywhere in this box</span>
         </button>
@@ -108,7 +106,6 @@ function SlotEntry({ slot, reading, date, busy, onSave, onDelete, suggested, foc
 
 export default function DayEntries({ date, readings, busy, onSave, onDelete, focusRequest }) {
   const bySlot = new Map((readings || []).map((reading) => [reading.slot, reading]));
-  const nowSlot = date === localDate() ? suggestedSlot() : null;
   return (
     <section className="section day-section" aria-labelledby="day-title">
       <div className="section-head day-header">
@@ -118,9 +115,9 @@ export default function DayEntries({ date, readings, busy, onSave, onDelete, foc
       <div className="slot-grid">
         {SLOTS.map((slot) => <SlotEntry key={`${date}-${slot.value}`} slot={slot}
           reading={bySlot.get(slot.value)} date={date} busy={busy} onSave={onSave} onDelete={onDelete}
-          suggested={slot.value === nowSlot} focusRequest={focusRequest}/>)}
+          focusRequest={focusRequest}/>)}
       </div>
-      <p className="helper-note">Choose a box to enter a reading. The “Now” marker uses clock time only, not your meal schedule. Band colors are illustrative.</p>
+      <p className="helper-note">Choose a box to enter a reading. Reference-band colors are illustrative, not personalized targets.</p>
     </section>
   );
 }

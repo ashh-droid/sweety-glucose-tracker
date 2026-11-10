@@ -8,6 +8,7 @@ import './styles.css';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let alive = true;
@@ -16,12 +17,23 @@ function App() {
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, []);
+  useEffect(() => {
+    function handleExpiredSession() {
+      setUser(null);
+      setSessionExpired(true);
+    }
+    window.addEventListener('sweety:session-expired', handleExpiredSession);
+    return () => window.removeEventListener('sweety:session-expired', handleExpiredSession);
+  }, []);
   async function logout() {
     try { await api('/auth/logout', { method: 'POST' }); }
-    finally { setUser(null); }
+    finally { setSessionExpired(false); setUser(null); }
   }
   if (loading) return <div className="boot-splash"><div className="boot-heart">♥</div><p>Loading Sweety...</p></div>;
-  return user ? <Dashboard user={user} onLogout={logout}/> : <AuthScreen onLogin={setUser}/>;
+  return user
+    ? <Dashboard user={user} onLogout={logout}/>
+    : <AuthScreen sessionExpired={sessionExpired}
+        onLogin={(nextUser) => { setSessionExpired(false); setUser(nextUser); }}/>;
 }
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App/></React.StrictMode>);

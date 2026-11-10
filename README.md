@@ -15,7 +15,7 @@ A private, full-stack glucose reading journal built for the **Kenpath Junior Ful
 - Database `UNIQUE(user_id, reading_date, slot)` and `CHECK` constraints protect data even if multiple requests arrive concurrently.
 - Daily, **month-to-date**, and **previous full calendar month** reports: minimum, maximum, average (1 decimal), and count. The daily report lists each entry.
 - Responsive logbook layout with four in-place entry boxes, print-friendly month diary, empty states, and loading/error feedback.
-- **Bonus:** server-side pagination for `GET /api/readings?page=1&limit=20`, used in the reading-history panel. A user-scoped `GET /api/readings/month?month=YYYY-MM` serves the printable diary.
+- **Bonus:** reading-level pagination at `GET /api/readings?page=1&limit=20` and complete-day cursor pagination at `GET /api/readings/days?limit=7&before=YYYY-MM-DD`. A user-scoped `GET /api/readings/month?month=YYYY-MM` serves the printable diary.
 - A reusable seed script that creates or refreshes a demo account and sample readings.
 
 ## Prerequisites
@@ -110,7 +110,7 @@ Use HTTPS and `NODE_ENV=production` behind a reverse proxy for deployments with 
 npm test
 ```
 
-The built-in Node test runner executes **26 standalone tests**: 17 API validation and date tests, 2 browser-side date tests, 6 month-grid tests, and 1 time suggestion test. They cover input boundaries, dates, report ranges, calendar grouping, future-day exclusion, and the approximate clock-based slot suggestion.
+The built-in Node test runner executes **28 standalone tests**: 17 API validation/date tests, 2 browser-side date tests, 6 month-grid tests, and 3 daily-average tests. They cover input boundaries, dates, report ranges, calendar grouping, future-day exclusion, and daily history averages.
 
 An additional **PostgreSQL + HTTP integration suite with six named subtests** verifies registration, cookie authentication, rate-limit scope, cross-user access restrictions, CRUD, duplicate protection, the month diary query, averages, pagination, and logout. It is skipped by default to avoid modifying your development database. To run it, create a **separate disposable test database** `sweety_test`, then set `TEST_DATABASE_URL`:
 
@@ -139,7 +139,8 @@ The integration test creates schema objects, inserts unique temporary accounts, 
 | `GET` | `/api/auth/me` | Return current user's basic profile |
 | `POST` | `/api/auth/logout` | Clear session |
 | `GET` | `/api/readings?date=2026-10-15` | Read own entries for a date (optional date) |
-| `GET` | `/api/readings?page=1&limit=20` | Paginated history (bonus) |
+| `GET` | `/api/readings?page=1&limit=20` | Paginated individual readings (bonus) |
+| `GET` | `/api/readings/days?limit=7&before=YYYY-MM-DD` | Complete days of reading history, cursor pagination |
 | `POST` | `/api/readings` | Create `{date,slot,value}` |
 | `PATCH` / `PUT` | `/api/readings/:id` | Edit fields of an owned reading (excludes itself from duplicate check) |
 | `DELETE` | `/api/readings/:id` | Delete an owned reading |
@@ -199,7 +200,7 @@ server/
 - **Validation precedence:** required value → integer range (40–600) → future date (or invalid date) → valid slot → count of already-filled slots → duplicate slot. For an already-full day, **the four-readings error wins over the duplicate error**. API validation failures return HTTP `400` with `{ "error": "..." }`; duplicate account emails return `409`. PostgreSQL unique violations are caught as a fallback for simultaneous requests.
 - Date values are returned as `YYYY-MM-DD` strings via the PostgreSQL type parser (`DATE`, OID 1082) to avoid time-zone conversion. Both API and frontend interpret **today** in `Asia/Kolkata`; configure this consistently if adapting the application to another timezone.
 - Tests use `node:test` rather than Jest: this keeps dev dependencies minimal while Supertest still exercises real HTTP requests when a disposable PostgreSQL test database is available. The client uses the browser's native `fetch` rather than adding Axios; neither choice affects assignment requirements.
-- Daily report shows all readings ordered by slot. The history panel is paginated by newest date.
+- Daily report shows all readings ordered by slot. History fetches the seven newest dates that contain readings and loads older complete days on demand.
 - Dates are stored as PostgreSQL `DATE` values, not timestamps, because readings have a prescribed daily time slot and no exact clock time is required.
 - For ease of review, a simple cookie-backed login is used rather than third-party identity providers. The app deliberately avoids medical interpretation and external analytics.
 - **What I'd improve with more time:** React Testing Library form tests, charts, password reset/verified email, CSRF token for wider deployment scenarios, account deletion/export, production secret management, automated accessibility audits, monitoring, and a robust CI pipeline. Bonus Redis/BullMQ/doctor accounts were intentionally not added because core correctness came first.
@@ -218,11 +219,20 @@ server/
 
 ## Interface and usability
 
-- Uses the supplied Sweety sugar-cube logo, favicon, lavender color tokens and Fraunces + Figtree type pairing.
-- The four reading slots are the primary task immediately below the masthead. Empty slots open an autofocused numerical input; press Enter to save and Escape to cancel.
-- The optional “Now” marker is based only on the Asia/Kolkata clock, not a personalized meal reminder.
+- Uses the supplied Sweety sugar-cube logo, favicon, lavender color tokens and Plus Jakarta Sans + Figtree type pairing.
+- Four reading slots appear directly below the masthead. Empty slots open an autofocused numerical input; press Enter to save or Escape to cancel.
 - Delete is accessible only when editing, with explicit confirmation.
 - The monthly log shows dates only through today in the current month, collapses long empty periods, and lets any cell open the corresponding reading form.
 - The print stylesheet expands collapsed periods so a paper copy includes each calendar day shown for the selected month.
 - The 70–180 band is an illustrative category, not medical guidance. Aggregate values mix different meal slots and are not a diagnostic assessment.
 - The month-to-date comparison uses the same numbered days of the previous month, clipped to its final day, rather than comparing with the full previous month.
+
+## Grouped history
+
+The Reading history section uses `GET /api/readings/days?limit=7&before=YYYY-MM-DD` to load seven complete calendar days containing readings. The `before` date is exclusive; the optional `nextBefore` cursor fetches older days, without splitting one day's readings across pages. Each day's four chips can open the related entry box; empty slots remain visible. The original reading-level paginated endpoint remains available for API clients.
+
+## Optional local sign-in demo autofill
+
+To display the **Use demo** button on the sign-in screen, create an untracked `client/.env.local` file with `VITE_SHOW_DEMO=true`, then restart Vite. The button fills `demo@sweety.local` and `Demo12345!` but does not submit the form automatically. The demo account must have been created with `npm run db:seed`. Do not enable this option on a public deployment or seed production data. The left-panel preview shows fictional example values only.
+
+When an authenticated request receives HTTP 401, the client returns to the sign-in screen with a session-expired notice. First-time visitors are not shown this message for a normal unauthenticated session check.

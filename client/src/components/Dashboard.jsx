@@ -8,15 +8,17 @@ import MonthGrid from './MonthGrid.jsx';
 import History from './History.jsx';
 import { api, localDate } from '../lib/api.js';
 
-const emptyHistory = { readings: [], pagination: { page: 1, pages: 0, total: 0 } };
-
 export default function Dashboard({ user, onLogout }) {
   const [selectedDate, setSelectedDate] = useState(localDate());
   const [focusRequest, setFocusRequest] = useState(null);
   const [month, setMonth] = useState(localDate().slice(0, 7));
   const [report, setReport] = useState(null);
-  const [recent, setRecent] = useState(emptyHistory);
-  const [recentPage, setRecentPage] = useState(1);
+  const [historyDays, setHistoryDays] = useState([]);
+  const [historyHasMore, setHistoryHasMore] = useState(false);
+  const [historyNext, setHistoryNext] = useState(null);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [olderLoading, setOlderLoading] = useState(false);
+  const [historyError, setHistoryError] = useState('');
   const [monthReadings, setMonthReadings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [monthLoading, setMonthLoading] = useState(true);
@@ -44,20 +46,16 @@ export default function Dashboard({ user, onLogout }) {
     let active = true;
     setLoading(true);
     setError('');
-    Promise.all([
-      api(`/reports?date=${encodeURIComponent(selectedDate)}`),
-      api(`/readings?page=${recentPage}&limit=8`)
-    ]).then(([summaries, history]) => {
+    api(`/reports?date=${encodeURIComponent(selectedDate)}`).then((summaries) => {
       if (!active) return;
       setReport(summaries);
-      setRecent(history);
     }).catch((err) => {
       if (active) setError(err.message);
     }).finally(() => {
       if (active) setLoading(false);
     });
     return () => { active = false; };
-  }, [selectedDate, recentPage, version]);
+  }, [selectedDate, version]);
 
   useEffect(() => {
     let active = true;
@@ -70,6 +68,40 @@ export default function Dashboard({ user, onLogout }) {
     return () => { active = false; };
   }, [month, version]);
 
+  useEffect(() => {
+    let active = true;
+    setHistoryLoading(true);
+    setHistoryError('');
+    api('/readings/days?limit=7')
+      .then(({ days, hasMore, nextBefore }) => {
+        if (!active) return;
+        setHistoryDays(days);
+        setHistoryHasMore(hasMore);
+        setHistoryNext(nextBefore);
+      })
+      .catch((err) => { if (active) setHistoryError(err.message); })
+      .finally(() => { if (active) setHistoryLoading(false); });
+    return () => { active = false; };
+  }, [version]);
+
+  async function loadOlderDays() {
+    if (!historyNext || olderLoading || historyLoading) return;
+    setOlderLoading(true);
+    setHistoryError('');
+    try {
+      const { days, hasMore, nextBefore } = await api(
+        `/readings/days?limit=7&before=${encodeURIComponent(historyNext)}`
+      );
+      setHistoryDays((current) => [...current, ...days.filter(
+        (day) => !current.some((existing) => existing.date === day.date)
+      )]);
+      setHistoryHasMore(hasMore);
+      setHistoryNext(nextBefore);
+    } catch (err) {
+      setHistoryError(err.message);
+    } finally { setOlderLoading(false); }
+  }
+
   async function saveReading(data, existing) {
     setSaving(true);
     setNotice('');
@@ -78,7 +110,6 @@ export default function Dashboard({ user, onLogout }) {
         method: existing ? 'PATCH' : 'POST', body: JSON.stringify(data)
       });
       setNotice(existing ? 'Reading updated.' : 'Reading recorded.');
-      setRecentPage(1);
       refresh();
     } finally { setSaving(false); }
   }
@@ -89,7 +120,6 @@ export default function Dashboard({ user, onLogout }) {
     try {
       await api(`/readings/${existing.id}`, { method: 'DELETE' });
       setNotice('Reading deleted.');
-      setRecentPage(1);
       refresh();
     } finally { setSaving(false); }
   }
@@ -118,7 +148,9 @@ export default function Dashboard({ user, onLogout }) {
         </>}
         <MonthGrid month={month} onChange={setMonth} readings={monthReadings} loading={monthLoading}
           error={monthError} onSelectDate={(date) => { changeDate(date); window.scrollTo({ top: 0, behavior: 'smooth' }); }} onSelectCell={selectCell}/>
-        <div className="no-print"><History recent={recent} page={recentPage} onPageChange={setRecentPage}/></div>
+        <div className="no-print"><History days={historyDays} hasMore={historyHasMore}
+          loading={historyLoading} loadingOlder={olderLoading} error={historyError}
+          onLoadOlder={loadOlderDays} onSelectCell={selectCell}/></div>
         <footer className="logbook-footer no-print"><span>Sweety | Your personal reading log</span><span>Tracking only. Not for diagnosis or treatment.</span></footer>
       </main>
     </div>
