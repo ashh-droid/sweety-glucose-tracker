@@ -1,0 +1,16 @@
+Subject: Re: Kenpath — Junior Full Stack Developer Assignment — Sweety — Asmita G V
+
+Dear Kenpath Engineering Team,
+
+Thank you for the opportunity. I am submitting my Sweety blood glucose tracker assignment.
+
+GitHub repository: [ADD THE ACTUAL PUBLIC REPOSITORY URL]
+Demo screenshots / screen recording: [ATTACH REAL FILES OR SHARE A VERIFIED LINK]
+
+The project includes user authentication, PostgreSQL-backed reading management, all required validation rules, and daily, month-to-date and previous-month reporting. I also implemented paginated reading history as an optional enhancement. The README includes installation steps, seed data, tests, assumptions, and potential future improvements.
+
+Thank you for reviewing my work. I look forward to your feedback.
+
+Best regards,
+Asmita G V
+Portfolio: https://ashh-droid.github.io/Portfolio/
