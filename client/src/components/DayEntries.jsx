@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { SLOTS, localDate, prettyDate } from '../lib/api.js';
 import Sparkle from './Sparkle.jsx';
+import { suggestedSlot } from '../lib/suggestion.js';
 
 export function bandFor(value) {
   const n = Number(value);
@@ -17,17 +18,6 @@ export const bandLabel = {
   high: 'Above reference band',
   'very-high': 'Well above reference band'
 };
-
-// Convenience suggestion based on the clock, not meal timing or medical advice.
-export function suggestedSlot(now = new Date()) {
-  const hour = Number(new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Asia/Kolkata', hour: '2-digit', hourCycle: 'h23'
-  }).format(now));
-  if (hour < 10) return 'morning_fasting';
-  if (hour < 13) return 'after_breakfast';
-  if (hour < 17) return 'after_lunch';
-  return 'after_dinner';
-}
 
 function SlotEntry({ slot, reading, date, busy, onSave, onDelete, suggested, focusRequest }) {
   const [editing, setEditing] = useState(false);
