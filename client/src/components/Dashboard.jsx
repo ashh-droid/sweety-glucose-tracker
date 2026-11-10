@@ -12,6 +12,7 @@ const emptyHistory = { readings: [], pagination: { page: 1, pages: 0, total: 0 }
 
 export default function Dashboard({ user, onLogout }) {
   const [selectedDate, setSelectedDate] = useState(localDate());
+  const [focusRequest, setFocusRequest] = useState(null);
   const [month, setMonth] = useState(localDate().slice(0, 7));
   const [report, setReport] = useState(null);
   const [recent, setRecent] = useState(emptyHistory);
@@ -33,6 +34,11 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const refresh = useCallback(() => setVersion((value) => value + 1), []);
+  const selectCell = (date, slot) => {
+    changeDate(date);
+    setFocusRequest({ date, slot, nonce: Date.now() + Math.random() });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     let active = true;
@@ -100,15 +106,18 @@ export default function Dashboard({ user, onLogout }) {
       </header>
       <main className="logbook-main">
         <div className="print-title print-only"><h1>Sweety | Glucose logbook</h1><p>{user.name} · {month}</p></div>
-        <div className="page-intro no-print"><div><p className="section-kicker">PERSONAL GLUCOSE JOURNAL</p><h1>Your readings, clearly.</h1></div><span className="intro-side">A record you can revisit, day by day.</span></div>
+        {selectedDate !== localDate() && <div className="past-date-notice no-print" role="status">
+          <span>Viewing {new Intl.DateTimeFormat('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(selectedDate + 'T12:00:00'))}</span>
+          <button type="button" onClick={() => changeDate(localDate())}>Back to today</button>
+        </div>}
         {error && <div role="alert" className="alert error no-print">{error} <button type="button" className="inline-link" onClick={refresh}>Retry</button></div>}
         {notice && <div role="status" className="alert success no-print">{notice}</div>}
-        {loading && !report ? <p role="status" className="loading-text">Loading your logbook…</p> : report && <>
-          <div className="no-print"><DayEntries date={selectedDate} readings={report.daily.readings} busy={saving} onSave={saveReading} onDelete={deleteReading}/></div>
+        {loading && (!report || report.selectedDate !== selectedDate) ? <p role="status" className="loading-text">Loading your logbook...</p> : report && report.selectedDate === selectedDate && <>
+          <div className="no-print"><DayEntries date={selectedDate} readings={report.daily.readings} busy={saving} onSave={saveReading} onDelete={deleteReading} focusRequest={focusRequest}/></div>
           <div className="no-print"><ReportLedger report={report}/></div>
         </>}
         <MonthGrid month={month} onChange={setMonth} readings={monthReadings} loading={monthLoading}
-          error={monthError} onSelectDate={(date) => { changeDate(date); window.scrollTo({ top: 0, behavior: 'smooth' }); }}/>
+          error={monthError} onSelectDate={(date) => { changeDate(date); window.scrollTo({ top: 0, behavior: 'smooth' }); }} onSelectCell={selectCell}/>
         <div className="no-print"><History recent={recent} page={recentPage} onPageChange={setRecentPage}/></div>
         <footer className="logbook-footer no-print"><span>Sweety | Your personal reading log</span><span>Tracking only. Not for diagnosis or treatment.</span></footer>
       </main>
