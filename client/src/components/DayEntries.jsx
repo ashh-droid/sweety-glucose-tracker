@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { SLOTS, localDate } from '../lib/api.js';
+import { SLOTS } from '../lib/api.js';
 
 export function bandFor(value) {
   const n = Number(value);

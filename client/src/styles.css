@@ -143,14 +143,8 @@ h1, h2, h3 { color: var(--text); }
 .legend-dot.very-high { background: var(--very-high); }
 .disclaimer { max-width: 750px; margin: 10px 0 0; font-size: 11px; color: var(--muted); }
 
-/* Recent history remains available for paging through older entries. */
-.history-list { list-style: none; padding: 0; margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
-.history-list li { padding: 12px 17px; display: flex; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--line); }
-.history-list li:last-child { border-bottom: 0; }
-.history-list small { color: var(--muted); font-size: 11px; font-weight: 400; }
-.history-list strong { font-family: var(--font-body); font-size: 13px; font-weight: 500; white-space: nowrap; }
+/* History is grouped by complete days and shown as four aligned slots. */
 .history-empty { color: var(--muted); padding: 20px 0; }
-.history-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; font-size: 12px; color: var(--muted); }
 .logbook-footer { display: flex; justify-content: space-between; gap: 20px; color: var(--muted); font-size: 11px; padding: 15px 0; }
 
 /* Authentication: purpose-first split layout with readable demo preview. */
@@ -345,7 +339,7 @@ h1, h2, h3 { color: var(--text); }
   .no-print, .masthead, .page-intro, .history-section, .logbook-footer { display: none !important; }
   .print-only { display: block; }
   .logbook-main { padding: 0; max-width: none; }
-  .print-title h1 { font-family: Georgia, serif; font-size: 20pt; margin-bottom: 3mm; }
+  .print-title h1 { font-family: var(--font-display); font-size: 20pt; margin-bottom: 3mm; }
   .print-title p { font-size: 10pt; margin-bottom: 6mm; }
   .section, .month-section { padding: 0; border: none; }
   .month-section .section-head { margin-bottom: 4mm; }
