@@ -34,6 +34,7 @@ function SlotEntry({ slot, reading, date, busy, onSave, onDelete, suggested, foc
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
   const inputRef = useRef(null);
+  const handledRequest = useRef(null);
 
   useEffect(() => {
     setEditing(false);
@@ -42,7 +43,8 @@ function SlotEntry({ slot, reading, date, busy, onSave, onDelete, suggested, foc
   }, [date, slot.value, reading?.id]);
 
   useEffect(() => {
-    if (focusRequest?.slot === slot.value && focusRequest?.date === date) {
+    if (focusRequest?.nonce != null && handledRequest.current !== focusRequest.nonce && focusRequest.slot === slot.value && focusRequest.date === date) {
+      handledRequest.current = focusRequest.nonce;
       setValue(reading ? String(reading.value) : '');
       setError('');
       setEditing(true);

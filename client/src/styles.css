@@ -347,3 +347,6 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; font-optical-si
   .month-table td .print-only { display: inline; }
   .month-table thead th { position: static; }
 }
+
+/* Specificity: peach highlights must win over the default empty lavender card. */
+.slot-entry.is-empty.slot-now { background: var(--peach-50); border-color: #EACBAE; }

@@ -53,7 +53,6 @@ export default function AuthScreen({ onLogin }) {
         <div className="mobile-auth-brand"><Brand compact /></div>
         <div className="auth-panel">
           <div className="auth-symbol"><LockKeyhole size={20} /></div>
-          <p className="section-kicker">YOUR PRIVATE LOGBOOK</p>
           <h2>{isRegister ? 'Create an account' : 'Welcome back'}</h2>
           <p className="auth-subtitle">{isRegister ? 'Start your daily record.' : 'Sign in to pick up where you left off.'}</p>
           <form onSubmit={submit} noValidate>
