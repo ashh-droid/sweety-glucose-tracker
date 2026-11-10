@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { SLOTS, localDate, prettyDate } from '../lib/api.js';
+import { SLOTS, localDate } from '../lib/api.js';
 import Sparkle from './Sparkle.jsx';
 import { suggestedSlot } from '../lib/suggestion.js';
 
@@ -112,7 +112,7 @@ export default function DayEntries({ date, readings, busy, onSave, onDelete, foc
   return (
     <section className="section day-section" aria-labelledby="day-title">
       <div className="section-head day-header">
-        <h1 id="day-title">{prettyDate(date)}</h1>
+        <h1 id="day-title">{new Intl.DateTimeFormat('en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(date + 'T12:00:00Z'))}</h1>
         <span className="completion-count">{readings.length} of 4 recorded</span>
       </div>
       <div className="slot-grid">
