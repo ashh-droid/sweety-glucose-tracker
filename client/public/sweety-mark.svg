@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Sweety">
+  <g stroke-linejoin="round" stroke-width="3">
+    <path d="M32 9L55 21L32 33L9 21Z" fill="#DDD2F1" stroke="#DDD2F1"/>
+    <path d="M9 21L32 33L32 57L9 45Z" fill="#6648AA" stroke="#6648AA"/>
+    <path d="M32 33L55 21L55 45L32 57Z" fill="#45317A" stroke="#45317A"/>
+  </g>
+  <path d="M32 14Q33 20 39 21Q33 22 32 28Q31 22 25 21Q31 20 32 14Z" fill="#F6B48C"/>
+</svg>

@@ -20,7 +20,7 @@ function App() {
     try { await api('/auth/logout', { method: 'POST' }); }
     finally { setUser(null); }
   }
-  if (loading) return <div className="boot-splash"><div className="boot-heart">♥</div><p>Loading Sweety…</p></div>;
+  if (loading) return <div className="boot-splash"><div className="boot-heart">♥</div><p>Loading Sweety...</p></div>;
   return user ? <Dashboard user={user} onLogout={logout}/> : <AuthScreen onLogin={setUser}/>;
 }
 

@@ -90,6 +90,11 @@ test('API integration: auth, validation, isolation, CRUD and reports', {
     assert.equal(initialReport.body.daily.lowest, 100);
     assert.equal(initialReport.body.daily.highest, 141);
     assert.equal(initialReport.body.daily.average, 120.5);
+    assert.equal(initialReport.body.daily.inRangeCount, 2);
+    assert.equal(initialReport.body.monthToDate.inRangeCount, 2);
+    assert.equal(initialReport.body.previousMonth.inRangeCount, 0);
+    assert.equal(initialReport.body.previousMonthComparable.range.from, '2026-09-01');
+    assert.equal(initialReport.body.previousMonthComparable.count, 0);
     const monthDiary = await agentA.get('/api/readings/month?month=2026-10');
     assert.equal(monthDiary.status, 200);
     assert.equal(monthDiary.body.readings.length, 2);

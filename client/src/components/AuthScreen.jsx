@@ -36,7 +36,7 @@ export default function AuthScreen({ onLogin }) {
   return (
     <div className="auth-layout">
       <section className="auth-story" aria-label="About Sweety">
-        <Brand />
+        <Brand tone="dark" />
         <div className="story-content">
           <p className="story-kicker">THE DAILY LOGBOOK</p>
           <h1>Make room for<br/><em>the everyday.</em></h1>
@@ -44,7 +44,7 @@ export default function AuthScreen({ onLogin }) {
           <div className="story-sample" aria-hidden="true">
             <span>Tuesday / 10 Nov</span>
             <div><b>Fasting</b><b>Breakfast</b><b>Lunch</b><b>Dinner</b></div>
-            <div className="sample-values"><strong>104</strong><strong>128</strong><strong>—</strong><strong>—</strong></div>
+            <div className="sample-values"><strong>104</strong><strong>128</strong><strong>·</strong><strong>·</strong></div>
           </div>
         </div>
         <p className="story-footer">A tracking tool, not medical advice.</p>
@@ -53,7 +53,6 @@ export default function AuthScreen({ onLogin }) {
         <div className="mobile-auth-brand"><Brand compact /></div>
         <div className="auth-panel">
           <div className="auth-symbol"><LockKeyhole size={20} /></div>
-          <p className="section-kicker">YOUR PRIVATE LOGBOOK</p>
           <h2>{isRegister ? 'Create an account' : 'Welcome back'}</h2>
           <p className="auth-subtitle">{isRegister ? 'Start your daily record.' : 'Sign in to pick up where you left off.'}</p>
           <form onSubmit={submit} noValidate>
