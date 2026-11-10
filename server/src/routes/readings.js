@@ -48,6 +48,48 @@ router.get('/', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// Cursor pagination returns complete calendar days, never partial four-slot days.
+// A single user-scoped query fetches one additional day to detect more history.
+router.get('/days', async (req, res, next) => {
+  const { before } = req.query;
+  if (before !== undefined && (typeof before !== 'string' || !isValidDate(before))) {
+    return res.status(400).json({ error: 'Please enter a valid before date.' });
+  }
+  const limit = req.query.limit === undefined ? 7 : Number(req.query.limit);
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 30) {
+    return res.status(400).json({ error: 'Limit must be a whole number between 1 and 30 days.' });
+  }
+  try {
+    const { rows } = await getPool().query(
+      `WITH selected_days AS (
+         SELECT reading_date
+         FROM readings
+         WHERE user_id = $1 AND ($2::date IS NULL OR reading_date < $2::date)
+         GROUP BY reading_date
+         ORDER BY reading_date DESC
+         LIMIT $3
+       )
+       SELECT r.id, r.reading_date AS date, r.slot, r.value_mgdl AS value
+       FROM selected_days AS d
+       JOIN readings AS r ON r.user_id = $1 AND r.reading_date = d.reading_date
+       ORDER BY d.reading_date DESC, CASE r.slot
+         WHEN 'morning_fasting' THEN 1 WHEN 'after_breakfast' THEN 2
+         WHEN 'after_lunch' THEN 3 ELSE 4 END`,
+      [req.userId, before ?? null, limit + 1]
+    );
+    const grouped = [];
+    for (const reading of rows) {
+      if (grouped.at(-1)?.date !== reading.date) {
+        grouped.push({ date: reading.date, readings: [] });
+      }
+      grouped.at(-1).readings.push(reading);
+    }
+    const hasMore = grouped.length > limit;
+    const days = grouped.slice(0, limit);
+    res.json({ days, hasMore, nextBefore: hasMore ? days.at(-1).date : null });
+  } catch (error) { next(error); }
+});
+
 // A dedicated, bounded month query powers the printable paper-diary view.
 // Every row remains scoped to the user from the authenticated session.
 router.get('/month', async (req, res, next) => {

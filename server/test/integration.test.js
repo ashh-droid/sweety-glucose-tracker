@@ -136,6 +136,44 @@ test('API integration: auth, validation, isolation, CRUD and reports', {
 
     });
 
+    await t.test('Day-grouped history has complete rows, cursors and ownership', async () => {
+      // Nine older days and two readings on August 9 exercise the seven-day cursor.
+      for (let day = 1; day <= 9; day++) {
+        const dayDate = `2026-08-${String(day).padStart(2, '0')}`;
+        assert.equal((await postReading(agentA, 'morning_fasting', 100 + day, dayDate)).status, 201);
+      }
+      assert.equal((await postReading(agentA, 'after_lunch', 192, '2026-08-09')).status, 201);
+
+      const firstPage = await agentA.get('/api/readings/days?limit=7');
+      assert.equal(firstPage.status, 200);
+      assert.equal(firstPage.body.days.length, 7);
+      assert.deepEqual(firstPage.body.days.map((item) => item.date), [
+        date, '2026-08-09', '2026-08-08', '2026-08-07', '2026-08-06', '2026-08-05', '2026-08-04'
+      ]);
+      assert.deepEqual(firstPage.body.days[0].readings.map((item) => item.slot), [
+        'morning_fasting', 'after_breakfast', 'after_lunch', 'after_dinner'
+      ]);
+      assert.deepEqual(firstPage.body.days[1].readings.map((item) => item.slot), [
+        'morning_fasting', 'after_lunch'
+      ]);
+      assert.equal(firstPage.body.hasMore, true);
+      assert.equal(firstPage.body.nextBefore, '2026-08-04');
+
+      const secondPage = await agentA.get(`/api/readings/days?limit=7&before=${firstPage.body.nextBefore}`);
+      assert.equal(secondPage.status, 200);
+      assert.deepEqual(secondPage.body.days.map((item) => item.date), [
+        '2026-08-03', '2026-08-02', '2026-08-01'
+      ]);
+      assert.equal(secondPage.body.hasMore, false);
+      assert.equal(secondPage.body.nextBefore, null);
+      assert.deepEqual((await agentB.get('/api/readings/days')).body.days, []);
+      assert.equal((await request(app).get('/api/readings/days')).status, 401);
+      assert.equal((await agentA.get('/api/readings/days?before=2026-02-30')).status, 400);
+      assert.equal((await agentA.get('/api/readings/days?limit=0')).status, 400);
+      assert.equal((await agentA.get('/api/readings/days?limit=31')).status, 400);
+      assert.equal((await agentA.get('/api/readings/days?limit=1.5')).status, 400);
+    });
+
     await t.test('Previous-month reports, deletion and logout', async () => {
     // Previous calendar-month aggregation, not rolling 30 days.
     assert.equal((await postReading(agentA, 'morning_fasting', 99, '2026-09-15')).status, 201);
