@@ -1,26 +1,80 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { prettyDate, slotLabel } from '../lib/api.js';
+import { SLOTS } from '../lib/api.js';
+import { bandFor, bandLabel } from './DayEntries.jsx';
 
-export default function History({ recent, page, onPageChange }) {
-  const { readings, pagination } = recent;
+function formatDay(date) {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Intl.DateTimeFormat('en-IN', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function DayRow({ date, readings, onSelectCell }) {
+  const slotMap = new Map(readings.map((reading) => [reading.slot, reading]));
+  const average = readings.length
+    ? (readings.reduce((total, reading) => total + Number(reading.value), 0) / readings.length).toFixed(1)
+    : null;
+
+  return (
+    <li className="history-day">
+      <div className="history-date">
+        <span className="history-date-label">{formatDay(date)}</span>
+        <span className="history-mobile-avg">{average ? `Avg ${average} mg/dl` : 'No readings'}</span>
+      </div>
+      <div className="history-chips" role="group" aria-label={`Readings for ${date}`}>
+        {SLOTS.map((slot) => {
+          const reading = slotMap.get(slot.value);
+          const band = reading ? bandFor(reading.value) : null;
+          return (
+            <button key={slot.value} type="button"
+              className={`history-chip ${band ? `band-${band}` : 'history-chip-empty'}`}
+              onClick={() => onSelectCell(date, slot.value)}
+              aria-label={reading
+                ? `Edit ${slot.label} on ${date}: ${reading.value} mg/dl, ${bandLabel[band]}`
+                : `Add ${slot.label} on ${date}`}>
+              <span className="history-chip-name">{slot.short === 'Fasting' ? 'Fast' : slot.short === 'Breakfast' ? 'Bkfst' : slot.short}</span>
+              <span className="history-chip-number">{reading ? reading.value : '·'}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="history-desktop-avg">
+        <span>Day avg.</span>
+        <strong>{average ?? '·'}</strong>
+        <small>{average ? 'mg/dl' : ''}</small>
+      </div>
+    </li>
+  );
+}
+
+export default function History({ days, hasMore, loading, loadingOlder, error, onLoadOlder, onSelectCell }) {
   return (
     <section className="section history-section" aria-labelledby="history-title">
-      <div className="section-head"><div><h2 id="history-title">Reading history</h2></div><span className="section-caption">{pagination.total} total</span></div>
-      {readings.length === 0 ? <p className="history-empty">No entries yet. Your reading history will appear here.</p> : (
-        <>
-          <ul className="history-list">
-            {readings.map((reading) => <li key={reading.id}>
-              <span>{prettyDate(reading.date)} <small>· {slotLabel(reading.slot)}</small></span>
-              <strong>{reading.value} <small>mg/dl</small></strong>
-            </li>)}
-          </ul>
-          {pagination.pages > 1 && <div className="history-pager">
-            <button type="button" className="icon-button" disabled={page <= 1} onClick={() => onPageChange(page - 1)} aria-label="Previous history page"><ChevronLeft size={18}/></button>
-            <span>Page {page} of {pagination.pages}</span>
-            <button type="button" className="icon-button" disabled={page >= pagination.pages} onClick={() => onPageChange(page + 1)} aria-label="Next history page"><ChevronRight size={18}/></button>
-          </div>}
-        </>
-      )}
+      <div className="section-head history-heading">
+        <h2 id="history-title">Reading history</h2>
+        <span className="section-caption">Grouped by day</span>
+      </div>
+      <div className="band-key history-legend" aria-label="Illustrative glucose reference bands">
+        <span><i className="legend-dot low"/> Below 70</span>
+        <span><i className="legend-dot in-range"/> 70 to 180</span>
+        <span><i className="legend-dot high"/> 181 to 250</span>
+        <span><i className="legend-dot very-high"/> Above 250</span>
+      </div>
+      {loading && days.length === 0 ? (
+        <p className="history-empty" role="status">Loading history...</p>
+      ) : days.length === 0 && !error ? (
+        <p className="history-empty">No readings yet. Your daily entries will appear here.</p>
+      ) : null}
+      {days.length > 0 && <ul className="history-days">
+        {days.map((day) => <DayRow key={day.date} date={day.date}
+          readings={day.readings} onSelectCell={onSelectCell}/>)}
+      </ul>}
+      {error && <div role="alert" className="alert error history-error">{error}</div>}
+      {hasMore && <div className="history-more">
+        <button type="button" className="button outline" onClick={onLoadOlder}
+          disabled={loading || loadingOlder}>
+          {loadingOlder ? 'Loading...' : 'Show older days'}
+        </button>
+      </div>}
     </section>
   );
 }

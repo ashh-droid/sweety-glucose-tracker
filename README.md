@@ -219,10 +219,13 @@ server/
 ## Interface and usability
 
 - Uses the supplied Sweety sugar-cube logo, favicon, lavender color tokens and Fraunces + Figtree type pairing.
-- The four reading slots are the primary task immediately below the masthead. Empty slots open an autofocused numerical input; press Enter to save and Escape to cancel.
-- The optional “Now” marker is based only on the Asia/Kolkata clock, not a personalized meal reminder.
+- Four reading slots appear directly below the masthead. Empty slots open an autofocused numerical input; press Enter to save or Escape to cancel.
 - Delete is accessible only when editing, with explicit confirmation.
 - The monthly log shows dates only through today in the current month, collapses long empty periods, and lets any cell open the corresponding reading form.
 - The print stylesheet expands collapsed periods so a paper copy includes each calendar day shown for the selected month.
 - The 70–180 band is an illustrative category, not medical guidance. Aggregate values mix different meal slots and are not a diagnostic assessment.
 - The month-to-date comparison uses the same numbered days of the previous month, clipped to its final day, rather than comparing with the full previous month.
+
+## Grouped history
+
+The Reading history section uses `GET /api/readings/days?limit=7&before=YYYY-MM-DD` to load seven complete calendar days containing readings. The `before` date is exclusive; the optional `nextBefore` cursor fetches older days, without splitting one day's readings across pages. Each day's four chips can open the related entry box; empty slots remain visible. The original reading-level paginated endpoint remains available for API clients.

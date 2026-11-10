@@ -277,8 +277,6 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; font-optical-si
 .slot-add-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
 .slot-add-center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; flex: 1; color: var(--primary); font-weight: 600; font-size: 13px; }
 .slot-add-foot { display: block; color: var(--muted); font-size: 10px; }
-.slot-now { background: var(--peach-50); border: 1px solid #EACBAE; }
-.now-tag { border-radius: 99px; background: #FFF; color: var(--peach-ink); font-size: 11px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 3px; font-weight: 700; }
 .slot-band-label { margin: 3px 0 9px; color: var(--band); font-size: 11px; font-weight: 600; }
 .slot-delete-edit { border: 0; background: none; color: var(--danger); padding: 7px 0 0; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; text-decoration: underline; }
 .slot-entry .slot-actions { margin-top: auto; }
@@ -295,7 +293,6 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; font-optical-si
 @media (max-width: 440px) {
   .slot-add-full { min-height: 143px; }
   .slot-entry { min-width: 0; }
-  .now-tag { font-size: 10px; padding: 2px 5px; }
   .slot-add-foot { font-size: 9px; }
   .day-header h1 { font-size: 26px; }
 }
@@ -349,4 +346,3 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; font-optical-si
 }
 
 /* Specificity: peach highlights must win over the default empty lavender card. */
-.slot-entry.is-empty.slot-now { background: var(--peach-50); border-color: #EACBAE; }
