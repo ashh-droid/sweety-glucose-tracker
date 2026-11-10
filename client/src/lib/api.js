@@ -11,7 +11,13 @@ export async function api(path, options = {}) {
   }
   if (response.status === 204) return null;
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'Something went wrong.');
+  if (!response.ok) {
+    if (response.status === 401 && path !== '/auth/me' && path !== '/auth/login' &&
+        typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('sweety:session-expired'));
+    }
+    throw new Error(data.error || 'Something went wrong.');
+  }
   return data;
 }
 

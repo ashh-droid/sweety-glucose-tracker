@@ -26,14 +26,14 @@ function previewDay() {
   }).format(new Date());
 }
 
-export default function AuthScreen({ onLogin }) {
+export default function AuthScreen({ onLogin, sessionExpired = false }) {
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(sessionExpired ? "You've been signed out. Sign in again to continue." : '');
   const emailTaken = error === "There's already an account with this email.";
 
   async function submit(event) {

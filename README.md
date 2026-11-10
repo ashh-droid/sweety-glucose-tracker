@@ -233,3 +233,5 @@ The Reading history section uses `GET /api/readings/days?limit=7&before=YYYY-MM-
 ## Optional local sign-in demo autofill
 
 To display the **Use demo** button on the sign-in screen, create an untracked `client/.env.local` file with `VITE_SHOW_DEMO=true`, then restart Vite. The button fills `demo@sweety.local` and `Demo12345!` but does not submit the form automatically. The demo account must have been created with `npm run db:seed`. Do not enable this option on a public deployment or seed production data. The left-panel preview shows fictional example values only.
+
+When an authenticated request receives HTTP 401, the client returns to the sign-in screen with a session-expired notice. First-time visitors are not shown this message for a normal unauthenticated session check.
