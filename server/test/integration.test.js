@@ -43,6 +43,8 @@ test('API integration: auth, validation, isolation, CRUD and reports', {
     assert.equal(await bcrypt.compare('strong-password-123', hashResult.rows[0].password_hash), true);
     assert.equal((await request(app).post('/api/auth/login').send({ email: emailA, password: 'incorrect-password' })).status, 401);
     assert.equal((await agentA.get('/api/auth/me')).body.user.email, emailA);
+    // Session checks are never counted against the login/register rate limiter.
+    for (let i = 0; i < 27; i++) assert.equal((await agentA.get('/api/auth/me')).status, 200);
     assert.equal((await request(app).get('/api/readings')).status, 401);
     assert.equal((await request(app).get('/api/reports')).status, 401);
 
@@ -66,6 +68,8 @@ test('API integration: auth, validation, isolation, CRUD and reports', {
     const duplicateSlot = await postReading(agentA, 'after_lunch', 150);
     assert.equal(duplicateSlot.status, 400);
     assert.equal(duplicateSlot.body.error, 'You already have an After lunch reading for this date.');
+    const duplicateFasting = await postReading(agentA, 'morning_fasting', 120);
+    assert.equal(duplicateFasting.body.error, 'You already have a Morning (fasting) reading for this date.');
     // Editing must exclude the original row when counting a slot as occupied.
     const editToTakenSlot = await agentA.put(`/api/readings/${first.body.reading.id}`).send({ slot: 'after_lunch' });
     assert.equal(editToTakenSlot.status, 400);
@@ -78,6 +82,12 @@ test('API integration: auth, validation, isolation, CRUD and reports', {
     assert.equal(initialReport.body.daily.lowest, 100);
     assert.equal(initialReport.body.daily.highest, 141);
     assert.equal(initialReport.body.daily.average, 120.5);
+    const monthDiary = await agentA.get('/api/readings/month?month=2026-10');
+    assert.equal(monthDiary.status, 200);
+    assert.equal(monthDiary.body.readings.length, 2);
+    assert.deepEqual(monthDiary.body.readings.map((r) => r.slot), ['morning_fasting', 'after_lunch']);
+    assert.equal((await agentB.get('/api/readings/month?month=2026-10')).body.readings.length, 0);
+    assert.equal((await agentA.get('/api/readings/month?month=2026-13')).status, 400);
     assert.deepEqual(initialReport.body.monthToDate.range, { from: '2026-10-01', to: date });
     assert.deepEqual(initialReport.body.previousMonth.range, { from: '2026-09-01', to: '2026-09-30' });
     assert.equal(initialReport.body.previousMonth.count, 0);

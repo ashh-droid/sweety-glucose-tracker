@@ -12,10 +12,15 @@ const ordering = `ORDER BY reading_date DESC, CASE slot
   WHEN 'morning_fasting' THEN 1 WHEN 'after_breakfast' THEN 2
   WHEN 'after_lunch' THEN 3 ELSE 4 END`;
 const today = () => localToday(process.env.APP_TIMEZONE || 'Asia/Kolkata');
+const article = (label) => label?.startsWith('Morning') ? 'a' : 'an';
+const duplicateMessage = (slot) => {
+  const label = SLOT_LABELS[slot] || 'existing slot';
+  return `You already have ${article(label)} ${label} reading for this date.`;
+};
 
 function dbError(res, error, slot) {
   if (error.code === '23505') {
-    return res.status(400).json({ error: `You already have an ${SLOT_LABELS[slot] || 'existing slot'} reading for this date.` });
+    return res.status(400).json({ error: duplicateMessage(slot) });
   }
   if (error.code === '23514') return res.status(400).json({ error: 'Invalid reading value or time slot.' });
   return null;
@@ -43,6 +48,29 @@ router.get('/', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// A dedicated, bounded month query powers the printable paper-diary view.
+// Every row remains scoped to the user from the authenticated session.
+router.get('/month', async (req, res, next) => {
+  const month = req.query.month;
+  if (typeof month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
+    return res.status(400).json({ error: 'Please select a valid month.' });
+  }
+  const [year, number] = month.split('-').map(Number);
+  const from = `${month}-01`;
+  const to = new Date(Date.UTC(year, number, 1)).toISOString().slice(0, 10);
+  try {
+    const { rows } = await getPool().query(
+      `SELECT ${columns} FROM readings
+       WHERE user_id = $1 AND reading_date >= $2 AND reading_date < $3
+       ORDER BY reading_date ASC, CASE slot
+         WHEN 'morning_fasting' THEN 1 WHEN 'after_breakfast' THEN 2
+         WHEN 'after_lunch' THEN 3 ELSE 4 END`,
+      [req.userId, from, to]
+    );
+    res.json({ month, readings: rows });
+  } catch (error) { next(error); }
+});
+
 router.post('/', async (req, res, next) => {
   const { errors, data } = validateReading(req.body || {}, today());
   if (errors.length) return res.status(400).json({ error: errors[0] });
@@ -57,7 +85,7 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'You can add only 4 readings per day.' });
     }
     if (existing.rows.some((row) => row.slot === data.slot)) {
-      return res.status(400).json({ error: `You already have an ${SLOT_LABELS[data.slot]} reading for this date.` });
+      return res.status(400).json({ error: duplicateMessage(data.slot) });
     }
     const result = await getPool().query(
       `INSERT INTO readings (user_id, reading_date, slot, value_mgdl)
@@ -94,7 +122,7 @@ async function updateReading(req, res, next) {
       return res.status(400).json({ error: 'You can add only 4 readings per day.' });
     }
     if (occupants.rows.some((row) => row.slot === data.slot)) {
-      return res.status(400).json({ error: `You already have an ${SLOT_LABELS[data.slot]} reading for this date.` });
+      return res.status(400).json({ error: duplicateMessage(data.slot) });
     }
     const updated = await getPool().query(
       `UPDATE readings SET reading_date=$1, slot=$2, value_mgdl=$3, updated_at=now()
