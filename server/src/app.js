@@ -17,7 +17,9 @@ app.use(cookieParser());
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 25, standardHeaders: 'draft-7', legacyHeaders: false,
   message: { error: 'Too many requests. Please try again later.' } });
-app.use('/api/auth', loginLimiter, authRoutes);
+app.use('/api/auth/login', loginLimiter);
+app.use('/api/auth/register', loginLimiter);
+app.use('/api/auth', authRoutes);
 app.use('/api/readings', readingRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api', (_req, res) => res.status(404).json({ error: 'API endpoint not found.' }));

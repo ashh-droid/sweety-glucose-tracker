@@ -1,0 +1,42 @@
+:root {
+  /* Lavender / brand */
+  --lav-50: #F7F4FC;
+  --lav-100: #EEE8F8;
+  --lav-200: #DDD2F1;
+  --lav-400: #9D85D2;
+  --lav-500: #7C61C0;
+  --lav-600: #6648AA;
+  --lav-800: #45317A;
+  --lav-900: #2B2046;
+
+  /* Neutrals */
+  --page: #FAF8FD;
+  --surface: #FFFFFF;
+  --line: #ECE6F3;
+  --body: #4B4459;
+  --muted: #6E6680;
+  --faint: #A79FB5;
+
+  /* Sugar accents */
+  --sparkle: #F6B48C;
+  --peach-50: #FFF3EA;
+  --peach-600: #C2622F;
+  --peach-ink: #7A3A17;
+  --dot: #E8899B;
+  --rose-50: #FDEEF1;
+  --rose-700: #B04460;
+
+  /* Glucose reference bands — illustrative, not medical guidance */
+  --low: #3D6FB6;
+  --in-range: #3F8F72;
+  --high: #CC8433;
+  --very-high: #B04460;
+
+  /* Semantic roles */
+  --text: var(--lav-900);
+  --primary: var(--lav-600);
+  --primary-hover: var(--lav-800);
+  --focus: var(--lav-200);
+  --danger: var(--rose-700);
+  --success: var(--in-range);
+}

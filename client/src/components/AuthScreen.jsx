@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, LockKeyhole } from 'lucide-react';
 import Brand from './Brand.jsx';
 import { api } from '../lib/api.js';
 
@@ -17,15 +17,20 @@ export default function AuthScreen({ onLogin }) {
     setBusy(true);
     try {
       const body = isRegister ? { name, email, password } : { email, password };
-      const result = await api(isRegister ? '/auth/register' : '/auth/login', { method: 'POST', body: JSON.stringify(body) });
-      onLogin(result.user);
-    } catch (err) { setError(err.message); }
-    finally { setBusy(false); }
+      const { user } = await api(isRegister ? '/auth/register' : '/auth/login', {
+        method: 'POST', body: JSON.stringify(body)
+      });
+      onLogin(user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
   }
 
-  function toggle() {
+  function switchMode() {
     setError('');
-    setIsRegister(!isRegister);
+    setIsRegister((value) => !value);
   }
 
   return (
@@ -33,33 +38,33 @@ export default function AuthScreen({ onLogin }) {
       <section className="auth-story" aria-label="About Sweety">
         <Brand />
         <div className="story-content">
-          <div className="eyebrow light"><Sparkles size={14}/> THE SMALL THINGS MATTER</div>
-          <h1>A little care,<br/><em>every day.</em></h1>
-          <p>Make sense of your glucose readings with a calm, simple space to track them.</p>
-          <div className="story-highlights">
-            <div><CheckCircle2 size={18}/> Four moments each day</div>
-            <div><CheckCircle2 size={18}/> Daily & monthly summaries</div>
-            <div><ShieldCheck size={18}/> Your readings stay yours</div>
+          <p className="story-kicker">THE DAILY LOGBOOK</p>
+          <h1>Make room for<br/><em>the everyday.</em></h1>
+          <p>A simple place for your four daily readings, with the details ready when you need them.</p>
+          <div className="story-sample" aria-hidden="true">
+            <span>Tuesday / 10 Nov</span>
+            <div><b>Fasting</b><b>Breakfast</b><b>Lunch</b><b>Dinner</b></div>
+            <div className="sample-values"><strong>104</strong><strong>128</strong><strong>—</strong><strong>—</strong></div>
           </div>
         </div>
-        <div className="story-footer">A personal log, not a substitute for medical guidance.</div>
+        <p className="story-footer">A tracking tool, not medical advice.</p>
       </section>
       <main className="auth-main">
-        <div className="mobile-brand"><Brand compact/></div>
+        <div className="mobile-auth-brand"><Brand compact /></div>
         <div className="auth-panel">
-          <div className="auth-symbol"><LockKeyhole size={22}/></div>
-          <span className="eyebrow">WELCOME TO SWEETY</span>
-          <h2>{isRegister ? 'Create your account' : 'Welcome back'}</h2>
-          <p className="muted auth-subtitle">{isRegister ? 'A clear picture of your day starts here.' : 'Sign in to see your readings and reports.'}</p>
+          <div className="auth-symbol"><LockKeyhole size={20} /></div>
+          <p className="section-kicker">YOUR PRIVATE LOGBOOK</p>
+          <h2>{isRegister ? 'Create an account' : 'Welcome back'}</h2>
+          <p className="auth-subtitle">{isRegister ? 'Start your daily record.' : 'Sign in to pick up where you left off.'}</p>
           <form onSubmit={submit} noValidate>
             {isRegister && <label className="field">Full name<input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" required minLength="2" maxLength="80" /></label>}
             <label className="field">Email address<input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required /></label>
-            <label className="field">Password<input type="password" autoComplete={isRegister ? 'new-password' : 'current-password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={isRegister ? 'At least 8 characters' : 'Enter your password'} required minLength="8" /></label>
+            <label className="field">Password<input type="password" autoComplete={isRegister ? 'new-password' : 'current-password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={isRegister ? 'At least 8 characters' : 'Your password'} required minLength="8" /></label>
             {error && <div role="alert" className="alert error">{error}</div>}
             <button className="button primary full" type="submit" disabled={busy}>{busy ? 'Please wait…' : isRegister ? 'Create account' : 'Sign in'} <ArrowRight size={18}/></button>
           </form>
-          <p className="switch-auth">{isRegister ? 'Already have an account?' : 'New to Sweety?'} <button type="button" className="text-button" onClick={toggle}>{isRegister ? 'Sign in' : 'Create an account'}</button></p>
-          <p className="security-note"><ShieldCheck size={15}/> Passwords are hashed and readings are private.</p>
+          <p className="switch-auth">{isRegister ? 'Already registered?' : 'New to Sweety?'} <button type="button" className="inline-link" onClick={switchMode}>{isRegister ? 'Sign in' : 'Create an account'}</button></p>
+          <p className="security-note">Your password is hashed and readings are private to your account.</p>
         </div>
       </main>
     </div>

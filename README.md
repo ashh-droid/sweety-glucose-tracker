@@ -14,8 +14,8 @@ A private, full-stack glucose reading journal built for the **Kenpath Junior Ful
 - Both UI and API error messages for required values, whole-number range **40–600**, one entry per date/slot, maximum **4** entries per day, and future-date prevention.
 - Database `UNIQUE(user_id, reading_date, slot)` and `CHECK` constraints protect data even if multiple requests arrive concurrently.
 - Daily, **month-to-date**, and **previous full calendar month** reports: minimum, maximum, average (1 decimal), and count. The daily report lists each entry.
-- Responsive desktop/mobile layout, empty states, confirmation before deletion, and loading/error feedback.
-- **Bonus:** server-side pagination for `GET /api/readings?page=1&limit=20`, used in the reading-history panel.
+- Responsive logbook layout with four in-place entry boxes, print-friendly month diary, empty states, and loading/error feedback.
+- **Bonus:** server-side pagination for `GET /api/readings?page=1&limit=20`, used in the reading-history panel. A user-scoped `GET /api/readings/month?month=YYYY-MM` serves the printable diary.
 - A reusable seed script that creates or refreshes a demo account and sample readings.
 
 ## Prerequisites
@@ -112,19 +112,19 @@ npm test
 
 The built-in Node test runner executes **19 isolated tests** (17 API-side validation/date tests and 2 client-side date formatting tests): missing and decimal values, range boundaries, nonexistent dates, future dates, all four time slots, leap-year and year-boundary report ranges, timezone behavior, and account-validation rules.
 
-An additional **PostgreSQL + HTTP integration test** verifies registration, cookie authentication, cross-user access restrictions, CRUD, duplicate protection, averages, pagination, and logout. It is skipped by default to avoid modifying your development database. To run it, create a **separate disposable test database** `sweety_test`, then set `TEST_DATABASE_URL`:
+An additional **PostgreSQL + HTTP integration suite with six named subtests** verifies registration, cookie authentication, rate-limit scope, cross-user access restrictions, CRUD, duplicate protection, the month diary query, averages, pagination, and logout. It is skipped by default to avoid modifying your development database. To run it, create a **separate disposable test database** `sweety_test`, then set `TEST_DATABASE_URL`:
 
 macOS/Linux:
 
 ```bash
-TEST_DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/sweety_test npm test
+TEST_DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/sweety_test npm run test:integration
 ```
 
 Windows PowerShell:
 
 ```powershell
 $env:TEST_DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/sweety_test"
-npm test
+npm run test:integration
 Remove-Item Env:TEST_DATABASE_URL
 ```
 
@@ -179,7 +179,7 @@ Successful report response shape:
 
 ```text
 client/                React, Vite, CSS, cookie-based API client
-  src/components/      Login/register, dashboard, readings form, report cards
+  src/components/      Login/register, date navigation, daily slots, report ledger, monthly diary and history
 server/
   db/schema.sql        PostgreSQL users/readings schema & constraints
   src/lib/             Date helpers, input validation, pooled DB client
@@ -204,8 +204,13 @@ server/
 - For ease of review, a simple cookie-backed login is used rather than third-party identity providers. The app deliberately avoids medical interpretation and external analytics.
 - **What I'd improve with more time:** React Testing Library form tests, charts, password reset/verified email, CSRF token for wider deployment scenarios, account deletion/export, production secret management, automated accessibility audits, monitoring, and a robust CI pipeline. Bonus Redis/BullMQ/doctor accounts were intentionally not added because core correctness came first.
 
-## Demo and submission
 
-See [`docs/DEMO_GUIDE.md`](docs/DEMO_GUIDE.md) for a 2–3 minute silent screen-recording script and screenshot checklist, and [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) for items to confirm **before making your GitHub repository public**.
+## Logbook design notes
 
-**Assignment deadline supplied by Kenpath: Friday, 13 November 2026.**
+- The primary interaction mirrors a paper glucose diary: one day and four prescribed time slots. The monthly table presents a full calendar month, including blank entries.
+- The combined `GET /api/reports?date=YYYY-MM-DD` returns daily, month-to-date and previous calendar month summaries in one request; it is a deliberate alternative to three routes.
+- The browser uses `Asia/Kolkata` for `today` to match the default server `APP_TIMEZONE`. If the server timezone changes, update the client date helper too.
+- Validation returns missing-value and range errors first, then future dates. When all four slots are full, the daily-limit message precedes the duplicate-slot message. Four unique slots already imply a four-reading maximum at the database level.
+- Colored value bands are illustrative UI categories, **not** personalized targets, diagnosis, or medical advice. Clinical interpretation depends on the individual and the measurement timing.
+- One month of readings is fetched in a dedicated authenticated query (at most 124 readings), avoiding truncation by history pagination.
+- Production improvements would include TLS termination, CSRF defenses for cookie-authenticated mutation routes when deployed cross-origin, login monitoring, expanded React interaction tests, configurable timezone across client and server, and medically reviewed user-specific ranges rather than illustrative bands.

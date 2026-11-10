@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import AuthScreen from './components/AuthScreen.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import { api } from './lib/api.js';
+import './tokens.css';
 import './styles.css';
 
 function App() {
