@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { SLOTS } from '../lib/api.js';
+import { glucoseValueError } from '../lib/readingValidation.js';
 
 export function bandFor(value) {
   const n = Number(value);
@@ -51,6 +52,11 @@ function SlotEntry({ slot, reading, date, busy, onSave, onDelete, focusRequest }
 
   async function submit(event) {
     event.preventDefault();
+    const validationError = glucoseValueError(value);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setError('');
     try {
       await onSave({ date, slot: slot.value, value }, reading);
@@ -73,9 +79,21 @@ function SlotEntry({ slot, reading, date, busy, onSave, onDelete, focusRequest }
           <form onSubmit={submit} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); cancel(); } }} className="slot-form" noValidate>
             <label className="sr-only" htmlFor={`entry-${slot.value}`}>Glucose value in mg/dl for {slot.label}</label>
             <div className="slot-input-row">
-              <input id={`entry-${slot.value}`} ref={inputRef} type="number" inputMode="numeric"
-                min="40" max="600" step="1" placeholder="mg/dl" value={value}
-                onChange={(event) => setValue(event.target.value)} disabled={busy} />
+              <input
+                id={`entry-${slot.value}`}
+                ref={inputRef}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="off"
+                placeholder="mg/dl"
+                value={value}
+                onChange={(event) => {
+                  setValue(event.target.value);
+                  if (error) setError('');
+                }}
+                disabled={busy}
+              />
               <button type="submit" className="slot-commit" disabled={busy} aria-label={`Save ${slot.label}`}><Check size={18}/></button>
               <button type="button" className="slot-cancel" onClick={cancel} disabled={busy} aria-label="Cancel entry"><X size={17}/></button>
             </div>
