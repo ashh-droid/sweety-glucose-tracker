@@ -134,6 +134,8 @@ export default function Dashboard({ user, onLogout }) {
     } finally { setSaving(false); }
   }
 
+  const isViewingPastDate = selectedDate !== localDate();
+
   return (
     <div className="logbook-shell">
       <header className="masthead no-print">
@@ -150,9 +152,9 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         </div>
       </header>
-      <main className="logbook-main">
+      <main className={`logbook-main ${isViewingPastDate ? "viewing-past-date" : ""}`}>
         <div className="print-title print-only"><h1>Sweety | Glucose logbook</h1><p>{user.name} · {month}</p></div>
-        {selectedDate !== localDate() && <div className="past-date-notice no-print" role="status">
+        {isViewingPastDate && <div className="past-date-notice no-print" role="status">
           <span>Viewing {shortDate(selectedDate)}</span>
           <button type="button" onClick={() => changeDate(localDate())}>Back to today</button>
         </div>}

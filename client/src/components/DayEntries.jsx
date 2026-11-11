@@ -117,7 +117,7 @@ export default function DayEntries({ date, readings, busy, onSave, onDelete, foc
           reading={bySlot.get(slot.value)} date={date} busy={busy} onSave={onSave} onDelete={onDelete}
           focusRequest={focusRequest}/>)}
       </div>
-      <p className="helper-note">Choose a box to enter a reading. Reference-band colors are illustrative, not personalized targets.</p>
+      <p className="helper-note">Choose a box to enter a reading.</p>
     </section>
   );
 }
