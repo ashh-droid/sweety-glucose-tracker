@@ -6,6 +6,27 @@ Built with **React + Vite, Node.js + Express, and PostgreSQL** for the Kenpath J
 
 > **Demo only.** Sweety records readings; it is not a medical device or a source of treatment advice. All seeded readings are fictional.
 
+## Screenshots
+
+The screenshots below show the running application with fictional demonstration data. Select an image to view it at full size.
+
+**Daily logbook and report summaries**
+
+[![Sweety dashboard with four glucose reading slots and three report summaries](docs/screenshots/dashboard.webp)](docs/screenshots/dashboard.webp)
+
+<details>
+<summary>View sign-in and monthly logbook screenshots</summary>
+
+**Sign-in screen**
+
+[![Sweety sign-in page with lavender brand panel and demo account button](docs/screenshots/sign-in.webp)](docs/screenshots/sign-in.webp)
+
+**Monthly glucose logbook**
+
+[![Sweety November month grid with four daily reading columns and averages](docs/screenshots/month-grid.webp)](docs/screenshots/month-grid.webp)
+
+</details>
+
 ## Quick start
 
 **Requirements:** Node.js 20+, npm, and a running PostgreSQL 13+ server.
