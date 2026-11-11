@@ -12,6 +12,8 @@ const ordering = `ORDER BY reading_date DESC, CASE slot
   WHEN 'morning_fasting' THEN 1 WHEN 'after_breakfast' THEN 2
   WHEN 'after_lunch' THEN 3 ELSE 4 END`;
 const today = () => localToday(process.env.APP_TIMEZONE || 'Asia/Kolkata');
+// Bound route IDs before passing them to PostgreSQL BIGINT parameters.
+const validReadingId = (id) => /^\d{1,18}$/.test(id);
 const article = (label) => label?.startsWith('Morning') ? 'a' : 'an';
 const duplicateMessage = (slot) => {
   const label = SLOT_LABELS[slot] || 'existing slot';
@@ -142,7 +144,7 @@ router.post('/', async (req, res, next) => {
 
 async function updateReading(req, res, next) {
   let requestedSlot;
-  if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ error: 'Invalid reading ID.' });
+  if (!validReadingId(req.params.id)) return res.status(400).json({ error: 'Invalid reading ID.' });
   try {
     const original = await getPool().query(
       `SELECT ${columns} FROM readings WHERE id = $1 AND user_id = $2`, [req.params.id, req.userId]
@@ -182,7 +184,7 @@ router.put('/:id', updateReading);
 router.patch('/:id', updateReading);
 
 router.delete('/:id', async (req, res, next) => {
-  if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ error: 'Invalid reading ID.' });
+  if (!validReadingId(req.params.id)) return res.status(400).json({ error: 'Invalid reading ID.' });
   try {
     const result = await getPool().query('DELETE FROM readings WHERE id = $1 AND user_id = $2 RETURNING id', [req.params.id, req.userId]);
     if (!result.rows.length) return res.status(404).json({ error: 'Reading not found.' });

@@ -111,6 +111,14 @@ test('API integration: auth, validation, isolation, CRUD and reports', {
     });
 
     await t.test('Ownership checks, updates and pagination', async () => {
+    // Extremely large IDs must be rejected before PostgreSQL BIGINT conversion.
+    const oversizedId = '99999999999999999999';
+    const hugeDelete = await agentA.delete(`/api/readings/${oversizedId}`);
+    assert.equal(hugeDelete.status, 400);
+    assert.equal(hugeDelete.body.error, 'Invalid reading ID.');
+    const hugeUpdate = await agentA.patch(`/api/readings/${oversizedId}`).send({ value: 120 });
+    assert.equal(hugeUpdate.status, 400);
+    assert.equal(hugeUpdate.body.error, 'Invalid reading ID.');
     // Cross-user isolation includes read, edit, and delete.
     assert.equal((await agentB.put(`/api/readings/${first.body.reading.id}`).send({ value: 250 })).status, 404);
     assert.equal((await agentB.delete(`/api/readings/${first.body.reading.id}`)).status, 404);
