@@ -251,7 +251,8 @@ h1, h2, h3 { color: var(--text); }
 .password-toggle {
   position: absolute;
   right: 7px;
-  top: 15px;
+  top: 50%;
+  transform: translateY(-50%);
   min-height: 34px;
   padding: 4px 9px;
   border: 0;
