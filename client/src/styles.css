@@ -545,3 +545,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; font-optical-si
   .history-chip-name { font-size: 9px; }
   .history-chip-number { font-size: 14px; }
 }
+
+/* The daily heading has a divider only when an older date banner is present. */
+.day-section { border-top: 0; }
+.viewing-past-date .day-section { border-top: 1px solid var(--line); }
