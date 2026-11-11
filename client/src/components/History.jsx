@@ -52,12 +52,6 @@ export default function History({ days, hasMore, loading, loadingOlder, error, o
         <h2 id="history-title">Reading history</h2>
         <span className="section-caption">Grouped by day</span>
       </div>
-      <div className="band-key history-legend" aria-label="Illustrative glucose reference bands">
-        <span><i className="legend-dot low"/> Below 70</span>
-        <span><i className="legend-dot in-range"/> 70 to 180</span>
-        <span><i className="legend-dot high"/> 181 to 250</span>
-        <span><i className="legend-dot very-high"/> Above 250</span>
-      </div>
       {loading && days.length === 0 ? (
         <p className="history-empty" role="status">Loading history...</p>
       ) : days.length === 0 && !error ? (

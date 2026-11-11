@@ -43,7 +43,6 @@ export default function ReportLedger({ report }) {
         <ReportItem title="Month to date" data={report.monthToDate} comparison={report.previousMonthComparable} />
         <ReportItem title="Previous month" data={report.previousMonth} />
       </div>
-      <p className="ledger-disclaimer">Reference band counts are descriptive only, not personalized health guidance. Averages combine different time slots.</p>
     </section>
   );
 }
