@@ -67,7 +67,7 @@ npm test
 npm run build
 ```
 
-`npm test` runs **28 standalone tests** (17 server-side validation/date tests, 2 browser-side date tests, 6 month-grid tests and 3 daily-history-average tests). The PostgreSQL integration suite is skipped unless a disposable test database is configured.
+`npm test` runs **33 standalone tests** (17 server-side validation/date tests, 2 browser-side date tests, 6 month-grid tests, 3 daily-history-average tests and 5 immediate reading-value validation tests). The PostgreSQL integration suite is skipped unless a disposable test database is configured.
 
 The integration suite exercises real HTTP requests and database operations: registration, password hashing, cookies, user isolation, validation, CRUD, reports, full-day history pagination and logout.
 
